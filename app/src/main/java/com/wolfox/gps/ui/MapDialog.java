@@ -29,7 +29,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wolfox.gps.manager.GPSMockManager;
-import com.wolfox.gps.model.HistoryEntry;
 import com.wolfox.gps.model.WFLocation;
 import com.wolfox.gps.util.MapSearchResolver;
 import com.wolfox.gps.util.WFLog;
@@ -156,11 +155,11 @@ public final class MapDialog {
         header.addView(title, new LinearLayout.LayoutParams(
                 0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
-        final String[] mapTypes = {"roadmap", "satellite", "hybrid", "terrain"};
+        final String[] mapTypes = {"roadmap", "satellite"};
         final Spinner spinner = new Spinner(activity);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity,
                 android.R.layout.simple_spinner_item,
-                new String[]{"طريق", "قمر صناعي", "هجين", "تضاريس"}) {
+                new String[]{"مخطط", "قمر صناعي"}) {
             @Override public View getView(int position, View view, ViewGroup parent) {
                 View value = super.getView(position, view, parent);
                 WFTheme.applyTree(value);
@@ -289,11 +288,6 @@ public final class MapDialog {
                             Toast.LENGTH_LONG).show();
                     return;
                 }
-                WFStorage.getInstance(activity).addHistory(new HistoryEntry(
-                        HistoryEntry.Action.CHANGE_LOCATION, latitude, longitude,
-                        "اختيار من الخريطة"));
-                WFStorage.getInstance(activity).addHistory(new HistoryEntry(
-                        HistoryEntry.Action.START_MOCK, "تأكيد التزييف من الخريطة"));
                 Toast.makeText(activity,
                         String.format(Locale.US, "تم تأكيد التزييف: %.5f, %.5f",
                                 latitude, longitude), Toast.LENGTH_SHORT).show();

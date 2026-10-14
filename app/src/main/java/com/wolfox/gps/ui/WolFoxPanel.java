@@ -20,7 +20,6 @@ import com.wolfox.gps.ModuleConfig;
 import com.wolfox.gps.manager.FloatingManager;
 import com.wolfox.gps.manager.GPSMockManager;
 import com.wolfox.gps.manager.LicenseManager;
-import com.wolfox.gps.model.HistoryEntry;
 import com.wolfox.gps.model.WFLocation;
 import com.wolfox.gps.util.WFStorage;
 import com.wolfox.gps.util.WFTheme;
@@ -106,8 +105,6 @@ public final class WolFoxPanel {
         toggle.setOnClickListener(v -> {
             if (running) {
                 GPSMockManager.getInstance().stopMocking();
-                WFStorage.getInstance(activity).addHistory(new HistoryEntry(
-                        HistoryEntry.Action.STOP_MOCK, "إيقاف من اللوحة"));
                 Toast.makeText(activity, "تم إيقاف التزييف", Toast.LENGTH_SHORT).show();
             } else if (!GPSMockManager.getInstance().hasMockLocation()) {
                 Toast.makeText(activity, "حدد موقعًا أولًا من الخريطة أو البحث",
@@ -121,8 +118,6 @@ public final class WolFoxPanel {
                             "هوك الموقع لم يستجب؛ أعد فتح التطبيق ثم حاول مجددًا",
                             Toast.LENGTH_LONG).show();
                 } else {
-                    WFStorage.getInstance(activity).addHistory(new HistoryEntry(
-                            HistoryEntry.Action.START_MOCK, "تشغيل مؤكد من اللوحة"));
                     Toast.makeText(activity, "تزييف الموقع نشط ومؤكد",
                             Toast.LENGTH_SHORT).show();
                 }
@@ -143,18 +138,14 @@ public final class WolFoxPanel {
                     dialog.dismiss();
                     FavoritesDialog.show(activity);
                 }),
-                action(activity, WFTheme.icon("◷") + "  السجل", v -> {
-                    dialog.dismiss();
-                    HistoryDialog.show(activity);
-                })));
-
-        root.addView(row(activity,
                 action(activity, WFTheme.icon("⚙") + "  الإعدادات", v -> {
                     dialog.dismiss();
                     SettingsDialog.show(activity);
-                }),
-                action(activity, WFTheme.icon("○") + "  إخفاء الأيقونة", v ->
-                        FloatingManager.getInstance().requestHideConfirmation(activity))));
+                })));
+
+        Button hideIcon = action(activity, WFTheme.icon("○") + "  إخفاء الأيقونة",
+                v -> FloatingManager.getInstance().requestHideConfirmation(activity));
+        root.addView(hideIcon, full(dp(activity, 44)));
 
         TextView footer = text(activity,
                 "اضغط على بطاقة الإحداثيات لنسخها  •  v" + ModuleConfig.VERSION_NAME,
@@ -234,9 +225,6 @@ public final class WolFoxPanel {
                     Toast.LENGTH_LONG).show();
             return;
         }
-        WFStorage.getInstance(activity).addHistory(new HistoryEntry(
-                HistoryEntry.Action.CHANGE_LOCATION, found.getLatitude(), found.getLongitude(),
-                "الموقع الحقيقي للجهاز"));
         Toast.makeText(activity, "تم تحديد موقع الجهاز", Toast.LENGTH_SHORT).show();
         dialog.dismiss();
         show(activity);

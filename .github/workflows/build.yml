@@ -27,13 +27,15 @@ jobs:
       - name: Verify APKs
         run: |
           test -s app/build/outputs/apk/debug/app-debug.apk
-          test -s lspatch/build/outputs/aar/lspatch-debug.aar
+          test -s lspatch/build/outputs/apk/debug/lspatch-debug.apk
           unzip -t app/build/outputs/apk/debug/app-debug.apk
-          unzip -t lspatch/build/outputs/aar/lspatch-debug.aar
+          unzip -t lspatch/build/outputs/apk/debug/lspatch-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose lspatch/build/outputs/apk/debug/lspatch-debug.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: WolFox-debug-APK-and-AAR
+          name: WolFox-two-debug-APKs
           path: |
             app/build/outputs/apk/debug/*.apk
-            lspatch/build/outputs/aar/*.aar
+            lspatch/build/outputs/apk/debug/*.apk
           if-no-files-found: error

@@ -47,6 +47,15 @@ jobs:
           test -s app/build/outputs/apk/debug/app-debug.apk
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose app/build/outputs/apk/debug/app-debug.apk
           sha256sum app/build/outputs/apk/debug/app-debug.apk
+      - name: Inspect generated package
+        run: |
+          set -euo pipefail
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -n 12
+          unzip -t "$APK" | tail -n 1
+          echo "### Android build verification" >> "$GITHUB_STEP_SUMMARY"
+          echo "Build: successful; APK signature and ZIP integrity checked." >> "$GITHUB_STEP_SUMMARY"
+          echo "Note: this is a scaffold APK, not a complete LSPatch module." >> "$GITHUB_STEP_SUMMARY"
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

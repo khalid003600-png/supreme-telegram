@@ -1,1 +1,0 @@
--keep class fun.p3nd.wolfox.module.WolFoxEntry { *; }

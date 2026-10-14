@@ -14,7 +14,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
       - name: Install SDK
         env:
           ANDROID_HOME: /usr/local/lib/android/sdk

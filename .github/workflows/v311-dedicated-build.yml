@@ -1,0 +1,57 @@
+name: WolFox v3.1.1 Dedicated Build
+on:
+  workflow_dispatch:
+  push:
+    branches: [wolfox-v311-repair-build]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Prepare Android SDK 34
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" --install "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Source preflight
+        run: |
+          java -version
+          test -f app/src/main/AndroidManifest.xml
+          test -d app/src/main/java
+          find app/src/main/java -name '*.java' | wc -l
+      - name: Compile APKs
+        run: gradle --no-daemon :app:assembleDebug :lspatch:assembleDebug --stacktrace
+      - name: Verify APKs
+        shell: bash
+        run: |
+          set -euo pipefail
+          A=app/build/outputs/apk/debug/app-debug.apk
+          M=lspatch/build/outputs/apk/debug/lspatch-debug.apk
+          test -s "$A"; test -s "$M"
+          unzip -t "$A"; unzip -t "$M"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose "$A"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose "$M"
+          sha256sum "$A" "$M" | tee APK_SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WolFox-v311-build-output
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            lspatch/build/outputs/apk/debug/*.apk
+            APK_SHA256.txt
+          if-no-files-found: error
+          retention-days: 30

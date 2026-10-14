@@ -1,7 +1,7 @@
 name: Android no-root verification
 on:
   push:
-    branches: [wolfox-lspatch-noroot]
+    branches: [wolfox-lspatch-noroot, wolfox-source-build]
   workflow_dispatch:
 permissions:
   contents: read

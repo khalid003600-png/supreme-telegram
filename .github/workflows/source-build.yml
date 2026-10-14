@@ -46,17 +46,17 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Build APK and AAR
-        run: gradle --no-daemon :app:assembleDebug :lspatch:assembleRelease --stacktrace
+      - name: Build two APKs
+        run: gradle --no-daemon :app:assembleDebug :lspatch:assembleDebug --stacktrace
       - name: Check artifacts
         run: |
           test -s app/build/outputs/apk/debug/app-debug.apk
-          test -s lspatch/build/outputs/aar/lspatch-release.aar
+          test -s lspatch/build/outputs/apk/debug/lspatch-debug.apk
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: WolFox-source-build
+          name: WolFox-source-two-APKs
           path: |
             app/build/outputs/apk/debug/*.apk
-            lspatch/build/outputs/aar/*.aar
+            lspatch/build/outputs/apk/debug/*.apk
           if-no-files-found: error

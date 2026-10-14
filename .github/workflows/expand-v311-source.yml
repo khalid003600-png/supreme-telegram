@@ -3,7 +3,6 @@ on:
   workflow_dispatch:
   push:
     branches: [wolfox-v311-repair-build]
-    paths: [WolFox_GPS_v3.1.1_FINAL_BUILD_SOURCE.zip]
 permissions:
   contents: write
 jobs:

@@ -16,7 +16,14 @@ jobs:
           java-version: '17'
       - uses: android-actions/setup-android@v3
       - name: Install SDK
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+        run: |
+          set -e
+          sdkmanager --sdk_root="$ANDROID_SDK_ROOT" "cmdline-tools;latest" "platform-tools"
+          sdkmanager --sdk_root="$ANDROID_SDK_ROOT" "platforms;android-35" "build-tools;35.0.0"
+          yes | sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --licenses || true
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'

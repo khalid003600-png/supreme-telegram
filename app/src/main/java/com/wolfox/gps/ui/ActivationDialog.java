@@ -73,7 +73,7 @@ public final class ActivationDialog {
     private static Dialog build(Activity activity) {
         Dialog dialog = new Dialog(activity, android.R.style.Theme_Material_Dialog);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setCancelable(false);
+        dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(false);
         Window w = dialog.getWindow();
         if (w != null) w.setBackgroundDrawableResource(android.R.color.transparent);
@@ -83,6 +83,15 @@ public final class ActivationDialog {
         root.setGravity(Gravity.CENTER_HORIZONTAL);
         root.setPadding(dp(activity, 22), dp(activity, 22), dp(activity, 22), dp(activity, 20));
         root.setBackground(round(BG, 22, 0xFF214D7D, 1));
+
+        LinearLayout top = new LinearLayout(activity);
+        top.setOrientation(LinearLayout.HORIZONTAL);
+        top.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
+        Button close = button(activity, "✕  إغلاق", CARD, TEXT);
+        close.setContentDescription("إغلاق نافذة التفعيل");
+        close.setOnClickListener(v -> dialog.dismiss());
+        top.addView(close, new LinearLayout.LayoutParams(dp(activity, 92), dp(activity, 42)));
+        root.addView(top, fullWrap());
 
         TextView mark = text(activity, "WF", 22, BLUE, true);
         mark.setGravity(Gravity.CENTER);

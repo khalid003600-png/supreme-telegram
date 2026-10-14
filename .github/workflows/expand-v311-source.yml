@@ -30,7 +30,6 @@ jobs:
           rm -f .github/workflows/android-build.yml .github/workflows/build.yml .github/workflows/source-build.yml .github/workflows/v311-dedicated-build.yml
           cp -a "$SRC/app" "$SRC/stubs" "$SRC/tests" .
           cp -a "$SRC/build.gradle" "$SRC/gradle.properties" "$SRC/settings.gradle" "$SRC/build-local.sh" "$SRC/verify-build-env.sh" .
-          cp -a "$SRC/.github/workflows/v311-verified-build.yml" .github/workflows/
           cp -a "$SRC/BUILD_REQUIREMENTS.md" "$SRC/BUILD_INVENTORY.txt" "$SRC/SHA256SUMS.txt" .
           chmod +x build-local.sh verify-build-env.sh
           test -f app/src/main/assets/wolfox_icon.png

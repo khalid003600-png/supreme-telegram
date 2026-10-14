@@ -13,7 +13,6 @@ import android.widget.*;
 
 import com.wolfox.gps.manager.GPSMockManager;
 import com.wolfox.gps.model.FavoriteLocation;
-import com.wolfox.gps.model.HistoryEntry;
 import com.wolfox.gps.model.WFLocation;
 import com.wolfox.gps.util.WFStorage;
 import com.wolfox.gps.util.WFTheme;
@@ -62,7 +61,7 @@ public class FavoritesDialog {
         title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
         header.addView(title, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
-        Button addBtn = buildBtn(activity, "+ إضافة", COLOR_GOLD);
+        Button addBtn = buildBtn(activity, "+ حفظ موقع جديد", COLOR_GOLD);
         addBtn.setTextColor(COLOR_BG);
         header.addView(addBtn);
 
@@ -206,12 +205,9 @@ public class FavoritesDialog {
         Button applyBtn = buildSmallBtn(activity, "📍", COLOR_GOLD);
         applyBtn.setTextColor(COLOR_BG);
         applyBtn.setOnClickListener(v -> {
-            GPSMockManager.getInstance().setLocation(fav.toWFLocation());
-            WFStorage.getInstance(activity).addHistory(
-                    new HistoryEntry(HistoryEntry.Action.CHANGE_LOCATION,
-                            fav.getLatitude(), fav.getLongitude(), fav.getName()));
+            GPSMockManager.getInstance().selectAndStart(fav.toWFLocation());
             parent.dismiss();
-            Toast.makeText(activity, "📍 " + fav.getName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "📍 تم تشغيل الموقع المحفوظ: " + fav.getName(), Toast.LENGTH_SHORT).show();
         });
         row.addView(applyBtn);
 
@@ -279,8 +275,6 @@ public class FavoritesDialog {
                         FavoriteLocation fav = new FavoriteLocation(name, lat, lng);
                         fav.setAddress(addrEt.getText().toString().trim());
                         WFStorage.getInstance(activity).addFavorite(fav);
-                        WFStorage.getInstance(activity).addHistory(
-                                new HistoryEntry(HistoryEntry.Action.ADD_FAVORITE, name));
                         reload.run();
                         Toast.makeText(activity, "✅ تم الحفظ", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
@@ -344,8 +338,6 @@ public class FavoritesDialog {
                 .setPositiveButton("استيراد", (d, w) -> {
                     String json = jsonEt.getText().toString().trim();
                     if (WFStorage.getInstance(activity).importFavoritesJson(json)) {
-                        WFStorage.getInstance(activity).addHistory(
-                                new HistoryEntry(HistoryEntry.Action.IMPORT, "استيراد مفضلة"));
                         reload.run();
                         Toast.makeText(activity, "✅ تم الاستيراد", Toast.LENGTH_SHORT).show();
                     } else {

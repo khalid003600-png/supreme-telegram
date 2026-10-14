@@ -1,0 +1,7 @@
+plugins { id 'com.android.library' }
+android {
+ namespace 'fun.p3nd.wolfox.module'
+ compileSdk 35
+ defaultConfig { minSdk 26; consumerProguardFiles 'consumer-rules.pro' }
+}
+dependencies { compileOnly 'de.robv.android.xposed:api:82' }

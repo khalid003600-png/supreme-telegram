@@ -1,9 +1,7 @@
-plugins { id 'com.android.application' }
+plugins { id 'com.android.application' version '8.2.2' }
 android {
- namespace 'com.wolfox.gps'
- compileSdk 34
- defaultConfig { minSdk 21; targetSdk 34; applicationId 'com.wolfox.gps'; versionCode 313; versionName "3.1.1" }
- compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
- buildTypes { release { minifyEnabled false; proguardFiles getDefaultProguardFile('proguard-android-optimize.txt') }; debug { minifyEnabled false; debuggable true } }
+ namespace 'com.wolfox.gps'; compileSdk 34
+ defaultConfig { applicationId 'com.wolfox.gps'; minSdk 21; targetSdk 34; versionCode 313; versionName '3.1.1' }
+ compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }
-dependencies { compileOnly 'de.robv.android.xposed:api:82'; compileOnly 'de.robv.android.xposed:api:82:sources' }
+dependencies { compileOnly files('libs/xposed-api-stub.jar') }

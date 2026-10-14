@@ -241,11 +241,11 @@ public class SettingsDialog {
         btnRow.addView(saveBtn);
 
         Button closeBtn = new Button(activity);
-        closeBtn.setText("إغلاق");
+        closeBtn.setText("رجوع");
         closeBtn.setTextColor(COLOR_WHITE);
         closeBtn.setBackgroundColor(COLOR_CARD);
         closeBtn.setLayoutParams(new LinearLayout.LayoutParams(0, dp(activity,44), 1f));
-        closeBtn.setOnClickListener(v -> dialog.dismiss());
+        closeBtn.setOnClickListener(v -> { dialog.dismiss(); WolFoxPanel.show(activity); });
         btnRow.addView(closeBtn);
 
         root.addView(btnRow);

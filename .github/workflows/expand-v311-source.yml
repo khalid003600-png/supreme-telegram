@@ -1,0 +1,51 @@
+name: Expand WolFox source archive
+on:
+  workflow_dispatch:
+  push:
+    branches: [wolfox-v311-repair-build]
+    paths: [WolFox_GPS_v3.1.1_FINAL_BUILD_SOURCE.zip]
+permissions:
+  contents: write
+jobs:
+  expand:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: wolfox-v311-repair-build
+          fetch-depth: 0
+      - name: Expand and replace old source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s WolFox_GPS_v3.1.1_FINAL_BUILD_SOURCE.zip
+          rm -rf /tmp/wolfox-src
+          mkdir -p /tmp/wolfox-src
+          unzip -q WolFox_GPS_v3.1.1_FINAL_BUILD_SOURCE.zip -d /tmp/wolfox-src
+          SRC=/tmp/wolfox-src/WolFox_GPS_v3.1.1_BUILD_READY
+          test -d "$SRC/app/src/main/java/com/wolfox/gps"
+          test -f "$SRC/.github/workflows/v311-verified-build.yml"
+          rm -rf app stubs tests lspatch scripts
+          rm -f build.gradle gradle.properties settings.gradle build-local.sh verify-build-env.sh
+          rm -f .github/workflows/android-build.yml .github/workflows/build.yml .github/workflows/source-build.yml .github/workflows/v311-dedicated-build.yml
+          cp -a "$SRC/app" "$SRC/stubs" "$SRC/tests" .
+          cp -a "$SRC/build.gradle" "$SRC/gradle.properties" "$SRC/settings.gradle" "$SRC/build-local.sh" "$SRC/verify-build-env.sh" .
+          cp -a "$SRC/.github/workflows/v311-verified-build.yml" .github/workflows/
+          cp -a "$SRC/BUILD_REQUIREMENTS.md" "$SRC/BUILD_INVENTORY.txt" "$SRC/SHA256SUMS.txt" .
+          chmod +x build-local.sh verify-build-env.sh
+          test -f app/src/main/assets/wolfox_icon.png
+          test -f app/src/main/assets/wolfox_map.html
+          test -f app/src/main/assets/xposed_init
+          test -f app/src/main/java/com/wolfox/gps/hook/WolFoxHook.java
+          rm -f WolFox_GPS_v3.1.1_FINAL_BUILD_SOURCE.zip
+      - name: Commit expanded source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "Replace legacy WolFox tree with v3.1.1 build-ready source"
+          git push origin HEAD:wolfox-v311-repair-build

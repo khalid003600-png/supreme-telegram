@@ -14,24 +14,34 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install SDK
+      - name: Install Android commandline tools and SDK packages
         env:
           ANDROID_HOME: /usr/local/lib/android/sdk
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
         run: |
           set -euo pipefail
-          SDKMANAGER="$ANDROID_SDK_ROOT/cmdline-tools/16.0/bin/sdkmanager"
-          if [ ! -x "$SDKMANAGER" ]; then
-            SDKMANAGER="$(command -v sdkmanager)"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
+          if [ ! -x "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" ]; then
+            TMPDIR="$(mktemp -d)"
+            trap 'rm -rf "$TMPDIR"' EXIT
+            echo "Downloading Android commandline tools..."
+            curl -fsSL -o "$TMPDIR/cmdline-tools.zip" "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
+            unzip -q "$TMPDIR/cmdline-tools.zip" -d "$TMPDIR"
+            mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+            mv "$TMPDIR"/cmdline-tools/* "$ANDROID_SDK_ROOT/cmdline-tools/latest/"
           fi
-          echo "Debug: sdkmanager path and version"
+          SDKMANAGER="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            echo "ERROR: sdkmanager not executable at $SDKMANAGER"
+            ls -la "$ANDROID_SDK_ROOT/cmdline-tools" || true
+            exit 1
+          fi
+          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
           "$SDKMANAGER" --version
-          "$SDKMANAGER" --list | head -n 35 || true
-          "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" "cmdline-tools;latest" "platform-tools"
-          LATEST="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
-          "$LATEST" --sdk_root="$ANDROID_SDK_ROOT" "platforms;android-35" "build-tools;35.0.0"
+          "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
           set +o pipefail
-          yes | "$LATEST" --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null
+          yes | "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null
           set -o pipefail
       - uses: gradle/actions/setup-gradle@v4
         with:

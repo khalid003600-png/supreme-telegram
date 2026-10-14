@@ -4,10 +4,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.*;
 
@@ -18,381 +19,129 @@ import com.wolfox.gps.util.WFStorage;
 import com.wolfox.gps.util.WFTheme;
 
 import java.util.List;
+import java.util.Locale;
 
-public class FavoritesDialog {
+/** Compact favorites UI matching the WolFox activation/panel visual language. */
+public final class FavoritesDialog {
+    private static final int BG=0xFF071426, CARD=0xFF0D203B, CARD2=0xFF123052;
+    private static final int BLUE=0xFF2787F5, WHITE=0xFFF4F8FF, MUTED=0xFF97ABC5;
+    private static final int RED=0xFFFF5563, GREEN=0xFF36D783;
 
-    private static final int COLOR_BG    = 0xFF070B18;
-    private static final int COLOR_GOLD  = 0xFF2787F5;
-    private static final int COLOR_WHITE = 0xFFFFFFFF;
-    private static final int COLOR_CARD  = 0xFF0E1428;
-    private static final int COLOR_RED   = 0xFFD32F2F;
+    private FavoritesDialog(){}
 
-    public static void show(Activity activity) {
-        if (activity == null || activity.isFinishing()) return;
-        activity.runOnUiThread(() -> buildAndShow(activity));
+    public static void show(Activity a){
+        if(a==null||a.isFinishing()) return;
+        a.runOnUiThread(()->build(a));
     }
 
-    private static void buildAndShow(Activity activity) {
-        Dialog dialog = new Dialog(activity, android.R.style.Theme_Material_Dialog);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setCancelable(true);
-        Window w = dialog.getWindow();
-        if (w != null) {
-            w.setBackgroundDrawableResource(android.R.color.transparent);
-            w.setLayout((int)(activity.getResources().getDisplayMetrics().widthPixels * 0.94),
-                    (int)(activity.getResources().getDisplayMetrics().heightPixels * 0.75));
-            w.setGravity(Gravity.CENTER);
-        }
+    private static void build(Activity a){
+        Dialog d=new Dialog(a,android.R.style.Theme_Material_Dialog);
+        d.requestWindowFeature(Window.FEATURE_NO_TITLE); d.setCancelable(true);
+        if(d.getWindow()!=null)d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
-        LinearLayout root = new LinearLayout(activity);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(COLOR_BG);
-        root.setPadding(dp(activity,14), dp(activity,14), dp(activity,14), dp(activity,14));
+        LinearLayout root=new LinearLayout(a); root.setOrientation(LinearLayout.VERTICAL);
+        root.setPadding(dp(a,14),dp(a,12),dp(a,14),dp(a,13));
+        root.setBackground(round(BG,22,0xFF214D7D,1));
 
-        // ─ رأس ─
-        LinearLayout header = new LinearLayout(activity);
-        header.setOrientation(LinearLayout.HORIZONTAL);
-        header.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout head=new LinearLayout(a); head.setGravity(Gravity.CENTER_VERTICAL);
+        TextView title=text(a,"★  المفضلة",17,BLUE,true);
+        head.addView(title,new LinearLayout.LayoutParams(0,dp(a,44),1f));
+        Button back=button(a,"‹  رجوع",CARD,WHITE);
+        back.setOnClickListener(v->{d.dismiss();WolFoxPanel.show(a);});
+        head.addView(back,new LinearLayout.LayoutParams(dp(a,92),dp(a,42)));
+        root.addView(head);
 
-        TextView title = new TextView(activity);
-        title.setText("⭐ المفضلة");
-        title.setTextColor(COLOR_GOLD);
-        title.setTextSize(16);
-        title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-        header.addView(title, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        TextView hint=text(a,"المواقع المحفوظة",12,MUTED,false);
+        hint.setGravity(Gravity.CENTER);
+        root.addView(hint,fullWrap());
 
-        Button addBtn = buildBtn(activity, "+ حفظ موقع جديد", COLOR_GOLD);
-        addBtn.setTextColor(COLOR_BG);
-        header.addView(addBtn);
+        ScrollView sv=new ScrollView(a);
+        LinearLayout list=new LinearLayout(a); list.setOrientation(LinearLayout.VERTICAL);
+        sv.addView(list); root.addView(sv,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0,1f));
 
-        Button exportBtn = buildBtn(activity, "📤", COLOR_CARD);
-        header.addView(exportBtn);
-
-        Button importBtn = buildBtn(activity, "📥", COLOR_CARD);
-        header.addView(importBtn);
-
-        root.addView(header);
-        addDivider(root, activity);
-
-        EditText filterEt = buildEditText(activity, "بحث في المفضلة...");
-        filterEt.setSingleLine(true);
-        filterEt.setTextColor(COLOR_WHITE);
-        filterEt.setBackgroundColor(COLOR_CARD);
-        root.addView(filterEt);
-
-        // ─ قائمة ─
-        ScrollView scroll = new ScrollView(activity);
-        LinearLayout list = new LinearLayout(activity);
-        list.setOrientation(LinearLayout.VERTICAL);
-        scroll.addView(list);
-        LinearLayout.LayoutParams scrollLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f);
-        scroll.setLayoutParams(scrollLp);
-        root.addView(scroll);
-
-        // ─ إغلاق ─
-        Button closeBtn = new Button(activity);
-        closeBtn.setText("إغلاق");
-        closeBtn.setTextColor(COLOR_WHITE);
-        closeBtn.setBackgroundColor(COLOR_CARD);
-        LinearLayout.LayoutParams closeLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(activity,44));
-        closeLp.setMargins(0, dp(activity,8), 0, 0);
-        closeBtn.setLayoutParams(closeLp);
-        closeBtn.setOnClickListener(v -> dialog.dismiss());
-        root.addView(closeBtn);
-
-        WFTheme.applyTree(root);
-        dialog.setContentView(root);
-
-        // ─ تحميل البيانات ─
-        Runnable reload = () -> {
+        final int[] mode={0}; // 0 normal, 1 edit, 2 delete
+        final Runnable[] reload=new Runnable[1];
+        reload[0]=()->{
             list.removeAllViews();
-            List<FavoriteLocation> favs = WFStorage.getInstance(activity).getFavorites();
-            String filter = filterEt.getText().toString().trim().toLowerCase();
-            int shown = 0;
-            if (favs.isEmpty()) {
-                TextView empty = new TextView(activity);
-                empty.setText("لا توجد مفضلة بعد");
-                empty.setTextColor(0xFF888888);
-                empty.setGravity(Gravity.CENTER);
-                empty.setPadding(0, dp(activity,24), 0, dp(activity,24));
-                list.addView(empty);
-            } else {
-                for (FavoriteLocation fav : favs) {
-                    String searchable = (String.valueOf(fav.getName()) + " "
-                            + String.valueOf(fav.getAddress())).toLowerCase();
-                    if (!filter.isEmpty() && !searchable.contains(filter)) continue;
-                    list.addView(buildFavItem(activity, fav, dialog, list));
-                    shown++;
-                }
-                if (shown == 0) {
-                    TextView empty = new TextView(activity);
-                    empty.setText("لا توجد نتائج");
-                    empty.setTextColor(0xFF888888);
-                    empty.setGravity(Gravity.CENTER);
-                    empty.setPadding(0, dp(activity,24), 0, dp(activity,24));
-                    list.addView(empty);
-                }
+            List<FavoriteLocation> favs=WFStorage.getInstance(a).getFavorites();
+            if(favs.isEmpty()){
+                TextView empty=text(a,"لا توجد مواقع محفوظة",13,MUTED,false);
+                empty.setGravity(Gravity.CENTER); empty.setPadding(0,dp(a,24),0,dp(a,24)); list.addView(empty);
+            }
+            for(FavoriteLocation f:favs){
+                LinearLayout card=new LinearLayout(a); card.setGravity(Gravity.CENTER_VERTICAL);
+                card.setPadding(dp(a,12),dp(a,8),dp(a,8),dp(a,8)); card.setBackground(round(CARD,14,0xFF28547E,1));
+                LinearLayout info=new LinearLayout(a); info.setOrientation(LinearLayout.VERTICAL);
+                info.addView(text(a,(f.getName()==null||f.getName().trim().isEmpty())?"موقع محفوظ":f.getName(),14,WHITE,true));
+                info.addView(text(a,String.format(Locale.US,"%.6f, %.6f",f.getLatitude(),f.getLongitude()),11,MUTED,false));
+                card.addView(info,new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,1f));
+                if(mode[0]==1){
+                    Button e=button(a,"تعديل",BLUE,WHITE); e.setOnClickListener(v->edit(a,f,reload[0]));
+                    card.addView(e,new LinearLayout.LayoutParams(dp(a,72),dp(a,38)));
+                }else if(mode[0]==2){
+                    Button x=button(a,"حذف",RED,WHITE); x.setOnClickListener(v->{
+                        WFStorage.getInstance(a).deleteFavorite(f.getId()); reload[0].run();
+                    }); card.addView(x,new LinearLayout.LayoutParams(dp(a,72),dp(a,38)));
+                }else card.setOnClickListener(v->{
+                    if(GPSMockManager.getInstance().selectAndStart(f.toWFLocation())){
+                        Toast.makeText(a,"تم اختيار وتشغيل الموقع: "+f.getName(),Toast.LENGTH_SHORT).show();
+                        d.dismiss(); WolFoxPanel.show(a);
+                    }else Toast.makeText(a,"تعذر تشغيل الموقع",Toast.LENGTH_SHORT).show();
+                });
+                LinearLayout.LayoutParams cp=fullWrap(); cp.setMargins(0,dp(a,6),0,0); list.addView(card,cp);
             }
             WFTheme.applyTree(list);
         };
+        reload[0].run();
 
-        reload.run();
+        Button manage=button(a,"تحرير المواقع المحفوظة",CARD2,WHITE);
+        manage.setOnClickListener(v->{mode[0]=0;reload[0].run();});
+        root.addView(manage,full(dp(a,42)));
 
-        filterEt.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { reload.run(); }
-            @Override public void afterTextChanged(Editable s) {}
-        });
+        LinearLayout modes=new LinearLayout(a);
+        Button editMode=button(a,"تعديل المواقع المحفوظة",BLUE,WHITE);
+        Button deleteMode=button(a,"حذف المواقع المحفوظة",RED,WHITE);
+        editMode.setOnClickListener(v->{mode[0]=1;reload[0].run();});
+        deleteMode.setOnClickListener(v->{mode[0]=2;reload[0].run();});
+        modes.addView(editMode,weight(a,42,6)); modes.addView(deleteMode,weight(a,42,0));
+        LinearLayout.LayoutParams mp=fullWrap();mp.setMargins(0,dp(a,6),0,0);root.addView(modes,mp);
 
-        // ─ إضافة موقع جديد ─
-        addBtn.setOnClickListener(v -> showAddDialog(activity, dialog, reload));
+        Button add=button(a,"＋  إضافة موقع جديد",GREEN,BG);
+        add.setOnClickListener(v->addCurrent(a,reload[0]));
+        LinearLayout.LayoutParams ap=full(dp(a,46));ap.setMargins(0,dp(a,6),0,0);root.addView(add,ap);
 
-        // ─ تصدير ─
-        exportBtn.setOnClickListener(v -> {
-            String json = WFStorage.getInstance(activity).exportFavoritesJson();
-            android.content.ClipboardManager cm = (android.content.ClipboardManager)
-                    activity.getSystemService(Context.CLIPBOARD_SERVICE);
-            if (cm != null) {
-                cm.setPrimaryClip(android.content.ClipData.newPlainText("favorites", json));
-                Toast.makeText(activity, "✅ تم نسخ المفضلة", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // ─ استيراد ─
-        importBtn.setOnClickListener(v -> showImportDialog(activity, dialog, reload));
-
-        dialog.show();
-        if (w != null) {
-            w.setLayout((int)(activity.getResources().getDisplayMetrics().widthPixels * 0.94),
-                    (int)(activity.getResources().getDisplayMetrics().heightPixels * 0.78));
-        }
+        WFTheme.applyTree(root); d.setContentView(root); d.show();
+        if(d.getWindow()!=null)d.getWindow().setLayout((int)(a.getResources().getDisplayMetrics().widthPixels*.92f),
+                (int)(a.getResources().getDisplayMetrics().heightPixels*.72f));
     }
 
-    private static View buildFavItem(Activity activity, FavoriteLocation fav,
-                                      Dialog parent, LinearLayout list) {
-        LinearLayout row = new LinearLayout(activity);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setBackgroundColor(COLOR_CARD);
-        LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(activity, 52));
-        rowLp.setMargins(0, 0, 0, dp(activity, 4));
-        row.setLayoutParams(rowLp);
-        row.setPadding(dp(activity,10), 0, dp(activity,6), 0);
-
-        // أيقونة + اسم
-        LinearLayout info = new LinearLayout(activity);
-        info.setOrientation(LinearLayout.VERTICAL);
-        info.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-
-        TextView name = new TextView(activity);
-        name.setText("⭐ " + fav.getName());
-        name.setTextColor(COLOR_WHITE);
-        name.setTextSize(13);
-        info.addView(name);
-
-        TextView coord = new TextView(activity);
-        coord.setText(String.format("%.5f, %.5f", fav.getLatitude(), fav.getLongitude()));
-        coord.setTextColor(0xFF888888);
-        coord.setTextSize(11);
-        info.addView(coord);
-
-        row.addView(info);
-
-        // زر تطبيق
-        Button applyBtn = buildSmallBtn(activity, "📍", COLOR_GOLD);
-        applyBtn.setTextColor(COLOR_BG);
-        applyBtn.setOnClickListener(v -> {
-            GPSMockManager.getInstance().selectAndStart(fav.toWFLocation());
-            parent.dismiss();
-            Toast.makeText(activity, "📍 تم تشغيل الموقع المحفوظ: " + fav.getName(), Toast.LENGTH_SHORT).show();
-        });
-        row.addView(applyBtn);
-
-        // زر تعديل
-        Button editBtn = buildSmallBtn(activity, "✏", COLOR_CARD);
-        editBtn.setOnClickListener(v -> showEditDialog(activity, fav, parent, () -> {
-            list.removeAllViews();
-            for (FavoriteLocation f : WFStorage.getInstance(activity).getFavorites())
-                list.addView(buildFavItem(activity, f, parent, list));
-        }));
-        row.addView(editBtn);
-
-        // زر حذف
-        Button delBtn = buildSmallBtn(activity, "🗑", COLOR_RED);
-        delBtn.setOnClickListener(v -> {
-            new AlertDialog.Builder(activity)
-                    .setTitle("حذف")
-                    .setMessage("حذف \"" + fav.getName() + "\"؟")
-                    .setPositiveButton("حذف", (d, w2) -> {
-                        WFStorage.getInstance(activity).deleteFavorite(fav.getId());
-                        list.removeAllViews();
-                        for (FavoriteLocation f : WFStorage.getInstance(activity).getFavorites())
-                            list.addView(buildFavItem(activity, f, parent, list));
-                    })
-                    .setNegativeButton("إلغاء", null)
-                    .show();
-        });
-        row.addView(delBtn);
-
-        return row;
+    private static void addCurrent(Activity a,Runnable reload){
+        WFLocation loc=GPSMockManager.getInstance().getLocation();
+        if(loc==null||!loc.isValid()){Toast.makeText(a,"حدد موقعًا من الخريطة أولًا",Toast.LENGTH_SHORT).show();return;}
+        EditText name=new EditText(a); name.setHint("اسم الموقع"); name.setSingleLine(true);
+        name.setTextColor(WHITE);name.setHintTextColor(MUTED);name.setGravity(Gravity.CENTER);
+        name.setBackground(round(CARD,12,0xFF28547E,1));name.setPadding(dp(a,10),0,dp(a,10),0);
+        LinearLayout box=new LinearLayout(a);box.setPadding(dp(a,18),dp(a,8),dp(a,18),0);box.addView(name,full(dp(a,46)));
+        new AlertDialog.Builder(a).setTitle("حفظ الموقع").setView(box)
+                .setNegativeButton("إلغاء",null).setPositiveButton("حفظ",(x,w)->{
+                    String n=name.getText().toString().trim();
+                    if(n.isEmpty()){Toast.makeText(a,"أدخل اسم الموقع",Toast.LENGTH_SHORT).show();return;}
+                    WFStorage.getInstance(a).addFavorite(new FavoriteLocation(n,loc.getLatitude(),loc.getLongitude()));
+                    reload.run();Toast.makeText(a,"تم حفظ الموقع",Toast.LENGTH_SHORT).show();
+                }).show();
     }
 
-    private static void showAddDialog(Activity activity, Dialog parent, Runnable reload) {
-        LinearLayout form = new LinearLayout(activity);
-        form.setOrientation(LinearLayout.VERTICAL);
-        form.setPadding(dp(activity,16), dp(activity,8), dp(activity,16), dp(activity,8));
-
-        EditText nameEt  = buildEditText(activity, "الاسم");
-        EditText latEt   = buildEditText(activity, "خط العرض (Latitude)");
-        EditText lngEt   = buildEditText(activity, "خط الطول (Longitude)");
-        EditText addrEt  = buildEditText(activity, "العنوان (اختياري)");
-
-        // ملء من الموقع الحالي
-        WFLocation cur = GPSMockManager.getInstance().getLocation();
-        if (cur != null) {
-            latEt.setText(String.valueOf(cur.getLatitude()));
-            lngEt.setText(String.valueOf(cur.getLongitude()));
-        }
-
-        form.addView(nameEt); form.addView(latEt);
-        form.addView(lngEt);  form.addView(addrEt);
-
-        new AlertDialog.Builder(activity)
-                .setTitle("إضافة مفضلة")
-                .setView(form)
-                .setPositiveButton("حفظ", (d, w) -> {
-                    try {
-                        String name = nameEt.getText().toString().trim();
-                        double lat  = Double.parseDouble(latEt.getText().toString().trim());
-                        double lng  = Double.parseDouble(lngEt.getText().toString().trim());
-                        WFLocation candidate = new WFLocation(lat, lng);
-                        if (!candidate.isValid()) throw new IllegalArgumentException("coordinates");
-                        if (name.isEmpty()) name = String.format(java.util.Locale.US,
-                                "%.5f, %.5f", lat, lng);
-                        FavoriteLocation fav = new FavoriteLocation(name, lat, lng);
-                        fav.setAddress(addrEt.getText().toString().trim());
-                        WFStorage.getInstance(activity).addFavorite(fav);
-                        reload.run();
-                        Toast.makeText(activity, "✅ تم الحفظ", Toast.LENGTH_SHORT).show();
-                    } catch (Exception e) {
-                        Toast.makeText(activity, "❌ بيانات غير صحيحة", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("إلغاء", null)
-                .show();
+    private static void edit(Activity a,FavoriteLocation f,Runnable reload){
+        EditText name=new EditText(a);name.setText(f.getName());name.setHint("اسم الموقع");name.setSingleLine(true);
+        new AlertDialog.Builder(a).setTitle("تعديل اسم الموقع").setView(name).setNegativeButton("إلغاء",null)
+                .setPositiveButton("حفظ",(x,w)->{String n=name.getText().toString().trim();if(!n.isEmpty()){f.setName(n);WFStorage.getInstance(a).updateFavorite(f);reload.run();}}).show();
     }
 
-    private static void showEditDialog(Activity activity, FavoriteLocation fav,
-                                        Dialog parent, Runnable reload) {
-        LinearLayout form = new LinearLayout(activity);
-        form.setOrientation(LinearLayout.VERTICAL);
-        form.setPadding(dp(activity,16), dp(activity,8), dp(activity,16), dp(activity,8));
-
-        EditText nameEt = buildEditText(activity, "الاسم");
-        EditText latEt  = buildEditText(activity, "خط العرض");
-        EditText lngEt  = buildEditText(activity, "خط الطول");
-
-        nameEt.setText(fav.getName());
-        latEt.setText(String.valueOf(fav.getLatitude()));
-        lngEt.setText(String.valueOf(fav.getLongitude()));
-
-        form.addView(nameEt); form.addView(latEt); form.addView(lngEt);
-
-        new AlertDialog.Builder(activity)
-                .setTitle("تعديل مفضلة")
-                .setView(form)
-                .setPositiveButton("حفظ", (d, w) -> {
-                    try {
-                        fav.setName(nameEt.getText().toString().trim());
-                        fav.setLatitude(Double.parseDouble(latEt.getText().toString().trim()));
-                        fav.setLongitude(Double.parseDouble(lngEt.getText().toString().trim()));
-                        if (!fav.toWFLocation().isValid()) throw new IllegalArgumentException("coordinates");
-                        WFStorage.getInstance(activity).updateFavorite(fav);
-                        reload.run();
-                        Toast.makeText(activity, "✅ تم التحديث", Toast.LENGTH_SHORT).show();
-                    } catch (Exception e) {
-                        Toast.makeText(activity, "❌ بيانات غير صحيحة", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("إلغاء", null)
-                .show();
-    }
-
-    private static void showImportDialog(Activity activity, Dialog parent, Runnable reload) {
-        LinearLayout form = new LinearLayout(activity);
-        form.setOrientation(LinearLayout.VERTICAL);
-        form.setPadding(dp(activity,16), dp(activity,8), dp(activity,16), dp(activity,8));
-
-        EditText jsonEt = new EditText(activity);
-        jsonEt.setHint("الصق JSON المفضلة هنا");
-        jsonEt.setMinLines(4);
-        jsonEt.setGravity(Gravity.TOP);
-        form.addView(jsonEt);
-
-        new AlertDialog.Builder(activity)
-                .setTitle("استيراد مفضلة")
-                .setView(form)
-                .setPositiveButton("استيراد", (d, w) -> {
-                    String json = jsonEt.getText().toString().trim();
-                    if (WFStorage.getInstance(activity).importFavoritesJson(json)) {
-                        reload.run();
-                        Toast.makeText(activity, "✅ تم الاستيراد", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(activity, "❌ JSON غير صالح", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("إلغاء", null)
-                .show();
-    }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
-
-    private static Button buildBtn(Activity ctx, String label, int bg) {
-        Button b = new Button(ctx);
-        b.setText(label); b.setTextColor(COLOR_WHITE);
-        b.setBackgroundColor(bg); b.setTextSize(12);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, dp(ctx,36));
-        lp.setMargins(dp(ctx,4), 0, 0, 0);
-        b.setLayoutParams(lp);
-        b.setPadding(dp(ctx,8),0,dp(ctx,8),0);
-        return b;
-    }
-
-    private static Button buildSmallBtn(Activity ctx, String label, int bg) {
-        Button b = new Button(ctx);
-        b.setText(label); b.setTextColor(COLOR_WHITE);
-        b.setBackgroundColor(bg); b.setTextSize(13);
-        b.setLayoutParams(new LinearLayout.LayoutParams(dp(ctx,40), dp(ctx,40)));
-        b.setPadding(0,0,0,0);
-        return b;
-    }
-
-    private static EditText buildEditText(Activity ctx, String hint) {
-        EditText et = new EditText(ctx);
-        et.setHint(hint); et.setHintTextColor(0xFF666666);
-        et.setTextColor(0xFF000000);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, dp(ctx,4), 0, dp(ctx,4));
-        et.setLayoutParams(lp);
-        return et;
-    }
-
-    private static void addDivider(LinearLayout parent, Context ctx) {
-        View d = new View(ctx);
-        d.setBackgroundColor(COLOR_GOLD);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(ctx,1));
-        lp.setMargins(0, dp(ctx,8), 0, dp(ctx,8));
-        d.setLayoutParams(lp);
-        parent.addView(d);
-    }
-
-    private static int dp(Context ctx, int dp) {
-        return Math.round(dp * ctx.getResources().getDisplayMetrics().density);
-    }
+    private static TextView text(Context c,String s,int z,int color,boolean bold){TextView v=new TextView(c);v.setText(s);v.setTextSize(z);v.setTextColor(color);WFTheme.apply(v,bold);return v;}
+    private static Button button(Context c,String s,int bg,int color){Button b=new Button(c);b.setAllCaps(false);b.setText(s);b.setTextSize(12);b.setTextColor(color);b.setBackground(round(bg,12,0xFF28547E,1));WFTheme.apply(b,true);return b;}
+    private static GradientDrawable round(int fill,int radius,int stroke,int sw){GradientDrawable g=new GradientDrawable();g.setColor(fill);g.setCornerRadius(radius*2f);if(sw>0)g.setStroke(sw,stroke);return g;}
+    private static LinearLayout.LayoutParams full(int h){return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,h);}
+    private static LinearLayout.LayoutParams fullWrap(){return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);}
+    private static LinearLayout.LayoutParams weight(Context c,int h,int m){LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(c,h),1f);p.setMargins(0,0,dp(c,m),0);return p;}
+    private static int dp(Context c,int v){return Math.round(v*c.getResources().getDisplayMetrics().density);}
 }

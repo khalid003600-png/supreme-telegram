@@ -1,0 +1,311 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Map</title>
+  <style>
+    @font-face { font-family:WolFoxDIN; src:url('wolfox/fonts/DINNextLTArabic-Regular.otf') format('opentype'); font-weight:400; }
+    @font-face { font-family:WolFoxDIN; src:url('wolfox/fonts/DINNextLTArabic-Medium.ttf') format('truetype'); font-weight:600; }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body, input, button { font-family:WolFoxDIN,Arial,sans-serif; }
+    html, body { width:100%; height:100%; margin:0; overflow:hidden; background:#071426; }
+    #map { position:absolute; inset:0; overflow:hidden; touch-action:none; background:#10243b; }
+    #tiles { position:absolute; inset:0; will-change:transform; }
+    .tile { position:absolute; width:256px; height:256px; border:0; user-select:none; -webkit-user-drag:none; }
+    .labels { z-index:2; background:transparent; }
+    #pin { position:absolute; left:50%; top:50%; width:36px; height:48px; margin:-48px 0 0 -18px;
+      z-index:20; pointer-events:none; transform-origin:50% 100%; filter:drop-shadow(0 3px 4px rgba(0,0,0,.55)); }
+    #pin svg { width:100%; height:100%; display:block; }
+    #pin path { fill:#e8202a; transition:fill .2s ease; }
+    body.spoof #pin path { fill:#22c55e; }
+    #pin.drop { animation:pinDrop .25s ease-out; }
+    @keyframes pinDrop { from { transform:translateY(-12px); opacity:.45; } to { transform:translateY(0); opacity:1; } }
+    #search { position:absolute; z-index:30; top:10px; left:50%; transform:translateX(-50%);
+      width:calc(100% - 92px); max-width:430px; height:44px; display:flex; direction:rtl;
+      background:#071426ee; border:1px solid #2787f5; border-radius:22px; overflow:hidden; }
+    #search input { min-width:0; flex:1; border:0; outline:0; background:transparent; color:#fff;
+      padding:0 14px; font-size:14px; direction:rtl; }
+    #search input::placeholder { color:#8aa1bb; }
+    #search button { width:48px; border:0; color:#fff; background:#2787f5; font-size:18px; }
+    #zoom { position:absolute; z-index:30; right:10px; top:64px; display:flex; flex-direction:column; gap:6px; }
+    #zoom button { width:42px; height:42px; border:1px solid #2787f5; border-radius:12px;
+      background:#071426ee; color:#fff; font-size:24px; }
+    #coords { position:absolute; z-index:30; bottom:12px; left:50%; transform:translateX(-50%);
+      min-width:210px; max-width:90%; padding:8px 14px; border:1px solid #2787f5; border-radius:18px;
+      background:#071426e8; color:#fff; text-align:center; direction:ltr; font-size:12px; }
+    #status { position:absolute; z-index:40; left:50%; top:50%; transform:translate(-50%,-50%);
+      padding:11px 16px; border-radius:14px; background:#071426e8; color:#d9e9ff; font-size:13px;
+      border:1px solid #244e78; white-space:nowrap; }
+    #credit { position:absolute; z-index:25; left:5px; bottom:3px; color:#fff; font-size:9px;
+      padding:2px 5px; background:#071426aa; direction:ltr; }
+    body.preview #search, body.preview #zoom, body.preview #coords, body.preview #credit { display:none; }
+    body.preview #pin { width:26px; height:35px; margin:-35px 0 0 -13px; }
+    body.preview #status { max-width:78%; white-space:normal; text-align:center; font-size:11px; padding:7px 10px; }
+  </style>
+</head>
+<body>
+  <div id="map"><div id="tiles"></div></div>
+  <div id="pin"><svg viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg"><path d="M18 47C18 47 2 29.5 2 17.5C2 8.4 9.2 1.5 18 1.5S34 8.4 34 17.5C34 29.5 18 47 18 47Z" stroke="#fff" stroke-width="2.2"/><circle cx="18" cy="17.5" r="6.2" fill="#fff"/></svg></div>
+  <form id="search"><input id="query" placeholder="عنوان، إحداثيات، أو رابط خريطة"><button type="submit">⌕︎</button></form>
+  <div id="zoom"><button id="zoomIn" type="button">＋</button><button id="zoomOut" type="button">−</button></div>
+  <div id="coords"></div>
+  <div id="status">جاري تحميل الخريطة…</div>
+  <div id="credit">© OpenStreetMap / Esri</div>
+
+  <script>
+  (function () {
+    'use strict';
+    var params = new URLSearchParams(location.search);
+    var preview = params.get('preview') === '1';
+    var spoof = params.get('spoof') === '1';
+    if (preview) document.body.classList.add('preview');
+    if (spoof) document.body.classList.add('spoof');
+    var selectedLat = clampLat(parseFloat(params.get('lat')) || 24.7136);
+    var selectedLng = wrapLng(parseFloat(params.get('lng')) || 46.6753);
+    var mapType = params.get('type') === 'satellite' ? 'satellite' : 'roadmap';
+    var zoom = preview ? 13 : 14;
+    var tileSize = 256;
+    var map = document.getElementById('map');
+    var tiles = document.getElementById('tiles');
+    var coords = document.getElementById('coords');
+    var status = document.getElementById('status');
+    var pin = document.getElementById('pin');
+    var firstTileLoaded = false;
+    var drag = null;
+
+    function clampLat(value) { return Math.max(-85.05112878, Math.min(85.05112878, value)); }
+    function wrapLng(value) { return ((value + 180) % 360 + 360) % 360 - 180; }
+    function worldSize() { return tileSize * Math.pow(2, zoom); }
+
+    function toWorld(lat, lng) {
+      var size = worldSize();
+      var sin = Math.sin(clampLat(lat) * Math.PI / 180);
+      return {
+        x: (wrapLng(lng) + 180) / 360 * size,
+        y: (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * size
+      };
+    }
+
+    function fromWorld(x, y) {
+      var size = worldSize();
+      x = ((x % size) + size) % size;
+      y = Math.max(0, Math.min(size, y));
+      var lng = x / size * 360 - 180;
+      var n = Math.PI - 2 * Math.PI * y / size;
+      var lat = 180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+      return { lat:clampLat(lat), lng:wrapLng(lng) };
+    }
+
+    function tileLayers(z, x, y) {
+      if (mapType === 'satellite') {
+        return [[
+          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' + z + '/' + y + '/' + x,
+          'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' + z + '/' + y + '/' + x
+        ]];
+      }
+      return [[
+        'https://tile.openstreetmap.org/' + z + '/' + x + '/' + y + '.png',
+        'https://a.tile.openstreetmap.org/' + z + '/' + x + '/' + y + '.png',
+        'https://basemaps.cartocdn.com/light_all/' + z + '/' + x + '/' + y + '.png'
+      ]];
+    }
+
+    function updateCoords() {
+      coords.textContent = selectedLat.toFixed(6) + ', ' + selectedLng.toFixed(6) + '  ·  Z' + zoom;
+    }
+
+    function addTile(sources, left, top, overlay) {
+      var image = new Image();
+      var sourceIndex = 0;
+      image.className = overlay ? 'tile labels' : 'tile';
+      image.style.left = Math.round(left) + 'px';
+      image.style.top = Math.round(top) + 'px';
+      image.decoding = 'async';
+      image.referrerPolicy = 'no-referrer';
+      image.onload = function () {
+        if (!firstTileLoaded) {
+          firstTileLoaded = true;
+          status.style.display = 'none';
+        }
+      };
+      image.onerror = function () {
+        sourceIndex += 1;
+        if (sourceIndex < sources.length) image.src = sources[sourceIndex];
+        else if (image.parentNode) image.parentNode.removeChild(image);
+      };
+      image.src = sources[sourceIndex];
+      tiles.appendChild(image);
+    }
+
+    function render() {
+      var center = toWorld(selectedLat, selectedLng);
+      var width = map.clientWidth || innerWidth;
+      var height = map.clientHeight || innerHeight;
+      var leftWorld = center.x - width / 2;
+      var topWorld = center.y - height / 2;
+      var startX = Math.floor(leftWorld / tileSize) - 1;
+      var endX = Math.floor((leftWorld + width) / tileSize) + 1;
+      var startY = Math.floor(topWorld / tileSize) - 1;
+      var endY = Math.floor((topWorld + height) / tileSize) + 1;
+      var count = Math.pow(2, zoom);
+      tiles.style.transform = '';
+      tiles.innerHTML = '';
+
+      for (var ty = startY; ty <= endY; ty++) {
+        if (ty < 0 || ty >= count) continue;
+        for (var tx = startX; tx <= endX; tx++) {
+          var wrappedX = ((tx % count) + count) % count;
+          var layers = tileLayers(zoom, wrappedX, ty);
+          for (var layer = 0; layer < layers.length; layer++) {
+            addTile(layers[layer], tx * tileSize - leftWorld,
+              ty * tileSize - topWorld, layer > 0);
+          }
+        }
+      }
+      updateCoords();
+    }
+
+    function point(event) {
+      var source = event.touches && event.touches.length ? event.touches[0]
+        : event.changedTouches && event.changedTouches.length ? event.changedTouches[0] : event;
+      return { x:source.clientX, y:source.clientY };
+    }
+
+    function begin(event) {
+      if (event.touches && event.touches.length !== 1) return;
+      var p = point(event);
+      var center = toWorld(selectedLat, selectedLng);
+      drag = { x:p.x, y:p.y, centerX:center.x, centerY:center.y };
+      if (event.cancelable) event.preventDefault();
+    }
+
+    function move(event) {
+      if (!drag) return;
+      var p = point(event);
+      tiles.style.transform = 'translate(' + (p.x - drag.x) + 'px,' + (p.y - drag.y) + 'px)';
+      if (event.cancelable) event.preventDefault();
+    }
+
+    function end(event) {
+      if (!drag) return;
+      var p = point(event);
+      var dx = p.x - drag.x;
+      var dy = p.y - drag.y;
+      var target;
+      if (Math.abs(dx) + Math.abs(dy) < 8) {
+        target = fromWorld(drag.centerX + p.x - map.clientWidth / 2,
+          drag.centerY + p.y - map.clientHeight / 2);
+      } else {
+        target = fromWorld(drag.centerX - dx, drag.centerY - dy);
+      }
+      selectedLat = target.lat;
+      selectedLng = target.lng;
+      drag = null;
+      pin.classList.remove('drop'); void pin.offsetWidth; pin.classList.add('drop');
+      render();
+      if (event.cancelable) event.preventDefault();
+    }
+
+    map.addEventListener('touchstart', begin, {passive:false});
+    map.addEventListener('touchmove', move, {passive:false});
+    map.addEventListener('touchend', end, {passive:false});
+    map.addEventListener('touchcancel', end, {passive:false});
+    map.addEventListener('mousedown', begin);
+    addEventListener('mousemove', move);
+    addEventListener('mouseup', end);
+
+    document.getElementById('zoomIn').onclick = function () { zoom = Math.min(19, zoom + 1); render(); };
+    document.getElementById('zoomOut').onclick = function () { zoom = Math.max(2, zoom - 1); render(); };
+
+    function normalizeNumberText(value) {
+      var arabic = '٠١٢٣٤٥٦٧٨٩';
+      var persian = '۰۱۲۳۴۵۶۷۸۹';
+      return String(value || '').replace(/[٠-٩]/g, function (digit) {
+        return arabic.indexOf(digit);
+      }).replace(/[۰-۹]/g, function (digit) {
+        return persian.indexOf(digit);
+      }).replace(/٫/g, '.').replace(/،/g, ',');
+    }
+
+    function showStatus(message, hideAfter) {
+      status.textContent = message;
+      status.style.display = 'block';
+      if (hideAfter) setTimeout(function () { status.style.display = 'none'; }, hideAfter);
+    }
+
+    document.getElementById('search').onsubmit = function (event) {
+      event.preventDefault();
+      var query = document.getElementById('query').value.trim();
+      if (!query) return;
+      var normalized = normalizeNumberText(query);
+      var match = normalized.match(/^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$/);
+      if (match) {
+        window.centerMap(parseFloat(match[1]), parseFloat(match[2]));
+        showStatus('✓ تم تحديد الإحداثيات', 1300);
+        return;
+      }
+
+      showStatus('جاري تحليل رابط المشاركة والبحث…', 0);
+      if (window.WolFoxSearchBridge
+          && typeof window.WolFoxSearchBridge.resolve === 'function') {
+        window.WolFoxSearchBridge.resolve(query);
+        return;
+      }
+
+      // Browser-only fallback; Android normally resolves through the native bridge.
+      fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=ar&q=' + encodeURIComponent(query))
+        .then(function (response) { return response.json(); })
+        .then(function (rows) {
+          if (!rows || !rows.length) throw new Error('not-found');
+          window.centerMap(parseFloat(rows[0].lat), parseFloat(rows[0].lon));
+          showStatus('✓ تم العثور على الموقع', 1300);
+        })
+        .catch(function () {
+          showStatus('× لم يتم العثور على الموقع', 2200);
+        });
+    };
+
+    window.onNativeSearchResult = function (lat, lng, label, source) {
+      if (!isFinite(lat) || !isFinite(lng)) {
+        window.onNativeSearchError('الإحداثيات غير صالحة');
+        return;
+      }
+      window.centerMap(Number(lat), Number(lng));
+      var details = source || 'تم العثور على الموقع';
+      if (label && label !== source) details += ' · ' + label;
+      showStatus('✓ ' + details, 1800);
+    };
+
+    window.onNativeSearchError = function (message) {
+      showStatus('× ' + (message || 'لم يتم العثور على الموقع'), 2400);
+    };
+
+    window.getSelectedLocation = function () { return [selectedLat, selectedLng]; };
+    window.setSpoofActive = function (active) {
+      document.body.classList.toggle('spoof', !!active);
+    };
+    window.centerMap = function (lat, lng) {
+      if (!isFinite(lat) || !isFinite(lng)) return;
+      selectedLat = clampLat(Number(lat));
+      selectedLng = wrapLng(Number(lng));
+      render();
+    };
+    window.setMapType = function (type) {
+      if (['roadmap','satellite'].indexOf(type) < 0) return;
+      mapType = type;
+      firstTileLoaded = false;
+      status.textContent = 'جاري تحميل الخريطة…';
+      status.style.display = 'block';
+      render();
+    };
+
+    addEventListener('resize', render);
+    setTimeout(function () {
+      if (!firstTileLoaded) status.textContent = 'تعذر تحميل الصور؛ تحقق من اتصال الإنترنت';
+    }, 8000);
+    render();
+  }());
+  </script>
+</body>
+</html>

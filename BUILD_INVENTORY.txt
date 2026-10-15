@@ -1,0 +1,22 @@
+WolFox GPS v3.1.1 CLEAN BUILD
+Java sources: 26
+Xposed stub sources: 5
+Assets: 6
+
+Excluded intentionally:
+- backend/
+- root_local_setup.sh
+- server deployment scripts
+- old APK/hash artifacts
+- duplicate release documentation not needed by compiler
+
+Required build environment:
+- Linux
+- Java 17
+- Android SDK platform 34
+- Android Build Tools 34.0.0 (aapt2, d8, zipalign, apksigner)
+- zip + keytool
+- release keystore variables, or WOLFOX_ALLOW_TEST_KEYSTORE=1 for isolated test build
+
+Runtime architecture:
+Xposed/LSPatch -> WolFoxHook -> DirectBootstrap/ActivityHook -> FloatingManager/WolFoxPanel

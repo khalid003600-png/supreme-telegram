@@ -1,7 +1,41 @@
+// =====================================================
+//  WolFox GPS Module — build.gradle (app)
+// =====================================================
+
 plugins { id 'com.android.application' }
+
 android {
-    namespace 'com.wolfox.noroot'
-    compileSdk 35
-    defaultConfig { applicationId 'com.wolfox.noroot'; minSdk 26; targetSdk 35; versionCode 1; versionName '0.1.0' }
-    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    namespace 'com.wolfox.gps'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 34
+        applicationId 'com.wolfox.gps'
+        versionCode 313
+        versionName "3.1.1"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            debuggable false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            debuggable true
+        }
+    }
+
+}
+
+dependencies {
+    // Xposed API is compiled from the local stubs/ tree by build-local.sh.
+    // No remote Xposed repository is required for the canonical Linux build.
 }

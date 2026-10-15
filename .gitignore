@@ -1,0 +1,12 @@
+/build/
+/app/build/
+/.gradle/
+/local.properties
+/toolchain/
+*.jks
+*.keystore
+*.p12
+*.pem
+.env
+.env.*
+mapping.txt

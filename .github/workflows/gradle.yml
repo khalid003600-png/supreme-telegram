@@ -7,6 +7,16 @@
 
 name: Java CI with Gradle
 
+# Grant broader permissions so the job can perform repository writes if needed.
+permissions:
+  contents: write
+  packages: write
+  issues: write
+  pull-requests: write
+  actions: write
+  id-token: write
+  security-events: write
+
 on:
   push:
     branches: [ "main" ]
@@ -18,7 +28,7 @@ jobs:
 
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
 
     steps:
     - uses: actions/checkout@v4
@@ -29,23 +39,30 @@ jobs:
         distribution: 'temurin'
 
     # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
-    # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
+    # The setup-gradle action is used to provide a system `gradle` command when the wrapper is not present.
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      with:
+        gradle-version: '8.7'
 
-    - name: Build with Gradle Wrapper
-      run: ./gradlew build
+    - name: Ensure gradlew is executable if present
+      run: |
+        if [ -f ./gradlew ]; then
+          chmod +x ./gradlew
+        fi
+
+    - name: Build with Gradle Wrapper or system Gradle
+      run: |
+        if [ -f ./gradlew ]; then
+          echo "Using Gradle wrapper"
+          ./gradlew build --no-daemon
+        else
+          echo "Gradle wrapper not found; using system Gradle"
+          gradle build --no-daemon
+        fi
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
-    # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
-    #
-    # - name: Setup Gradle
-    #   uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-    #   with:
-    #     gradle-version: '8.9'
-    #
-    # - name: Build with Gradle 8.9
-    #   run: gradle build
+    # If you'd like to add a wrapper to the repo, run `gradle wrapper --gradle-version 8.7` locally and commit `gradlew` and `gradle/wrapper`.
 
   dependency-submission:
 

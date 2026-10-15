@@ -38,6 +38,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 tests/verify_protected_artifact.py
           APK="$(find build/local/apk -name '*_SIGNED.apk' -type f -size +0c -print -quit)"
           test -n "$APK"
           unzip -t "$APK"
@@ -49,7 +50,8 @@ jobs:
           sha256sum "$APK" build/local/dex/classes.dex | tee build/local/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: WolFox-v3.1.1-verified-build
+          name: WolFox-v3.1.1-protected-TEST-build
+          retention-days: 7
           path: |
             build/local/apk/*_SIGNED.apk
             build/local/dex/classes.dex

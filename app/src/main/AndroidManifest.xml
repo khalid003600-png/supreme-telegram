@@ -8,6 +8,8 @@
 
     <application
         android:allowBackup="false"
+        android:debuggable="false"
+        android:usesCleartextTraffic="false"
         android:extractNativeLibs="false"
         android:hasCode="true"
         android:label="WolFox GPS Module"

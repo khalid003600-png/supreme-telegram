@@ -25,6 +25,7 @@ require_executable() {
 
 # Run all preflight checks before touching build/local.
 require_file "$platform_jar"
+require_file "$build_tools/lib/d8.jar"
 for tool in aapt2 d8 zipalign apksigner; do
   require_executable "$build_tools/$tool"
 done
@@ -69,7 +70,7 @@ mkdir -p "$output_dir/stub-classes" "$output_dir/classes" "$output_dir/dex" "$ou
 mapfile -d '' stub_sources < <(find "$project_dir/stubs" -name '*.java' -print0 | sort -z)
 ((${#stub_sources[@]} > 0)) || fail 'No Xposed stub sources were found.'
 if [[ "$compiler" == 'javac' ]]; then
-  javac -encoding UTF-8 -source 8 -target 8 -classpath "$platform_jar" \
+  javac -g:none -encoding UTF-8 -source 8 -target 8 -classpath "$platform_jar" \
     -d "$output_dir/stub-classes" "${stub_sources[@]}"
 else
   java -jar "$ecj_jar" -proc:none -encoding UTF-8 -source 1.8 -target 1.8 \
@@ -81,7 +82,7 @@ fi
 mapfile -d '' main_sources < <(find "$project_dir/app/src/main/java" -name '*.java' -print0 | sort -z)
 ((${#main_sources[@]} > 0)) || fail 'No module Java sources were found.'
 if [[ "$compiler" == 'javac' ]]; then
-  javac -encoding UTF-8 -source 8 -target 8 \
+  javac -g:none -encoding UTF-8 -source 8 -target 8 \
     -classpath "$platform_jar:$output_dir/xposed-stubs.jar" \
     -d "$output_dir/classes" "${main_sources[@]}"
 else
@@ -92,9 +93,16 @@ fi
 
 mapfile -d '' class_files < <(find "$output_dir/classes" -name '*.class' -print0 | sort -z)
 ((${#class_files[@]} > 0)) || fail 'Java compilation produced no classes.'
-"$build_tools/d8" --release --min-api 21 \
-  --lib "$platform_jar" --lib "$output_dir/xposed-stubs.jar" \
-  --output "$output_dir/dex" "${class_files[@]}"
+# R8 preserves runtime entry points while obfuscating module internals.
+(cd "$output_dir/classes" && zip -q -r "$output_dir/program.jar" .)
+mkdir -p "$output_dir/private"
+java -cp "$build_tools/lib/d8.jar" com.android.tools.r8.R8 \
+  --release --min-api 21 --lib "$platform_jar" \
+  --lib "$output_dir/xposed-stubs.jar" \
+  --pg-conf "$project_dir/app/proguard-rules.pro" \
+  --pg-map-output "$output_dir/private/mapping.txt" \
+  --output "$output_dir/dex" "$output_dir/program.jar"
+
 
 "$build_tools/aapt2" link \
   -I "$platform_jar" \
@@ -120,12 +128,14 @@ if [[ "$signing_mode" == 'test' ]]; then
     -dname 'CN=WolFox Test Module,OU=Testing,O=WolFox,C=SA' >/dev/null 2>&1
 fi
 
+export WOLFOX_SIGN_STORE_PASS="$key_store_pass" WOLFOX_SIGN_KEY_PASS="$key_pass"
 "$build_tools/apksigner" sign \
   --ks "$key_store" --ks-key-alias "$key_alias" \
-  --ks-pass "pass:$key_store_pass" --key-pass "pass:$key_pass" \
+  --ks-pass env:WOLFOX_SIGN_STORE_PASS --key-pass env:WOLFOX_SIGN_KEY_PASS \
   --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
   --out "$signed" "$aligned"
 
+unset WOLFOX_SIGN_STORE_PASS WOLFOX_SIGN_KEY_PASS
 "$build_tools/apksigner" verify --verbose --print-certs "$signed"
 printf 'build_mode=%s\n' "$signing_mode"
 printf 'apk=%s\n' "$signed"

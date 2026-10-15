@@ -4,17 +4,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.*;
 
 import com.wolfox.gps.manager.GPSMockManager;
 import com.wolfox.gps.model.FavoriteLocation;
-import com.wolfox.gps.model.WFLocation;
 import com.wolfox.gps.util.WFStorage;
 import com.wolfox.gps.util.WFTheme;
 
@@ -23,7 +20,7 @@ import java.util.Locale;
 
 /** Compact favorites UI matching the WolFox activation/panel visual language. */
 public final class FavoritesDialog {
-    private static final int BG=0xFF071426, CARD=0xFF0D203B, CARD2=0xFF123052;
+    private static final int BG=0xFF071426, CARD=0xFF0D203B;
     private static final int BLUE=0xFF2787F5, WHITE=0xFFF4F8FF, MUTED=0xFF97ABC5;
     private static final int RED=0xFFFF5563;
 
@@ -51,15 +48,10 @@ public final class FavoritesDialog {
         head.addView(back,new LinearLayout.LayoutParams(dp(a,92),dp(a,42)));
         root.addView(head);
 
-        TextView hint=text(a,"المواقع المحفوظة",12,MUTED,false);
-        hint.setGravity(Gravity.CENTER);
-        root.addView(hint,fullWrap());
-
         ScrollView sv=new ScrollView(a);
         LinearLayout list=new LinearLayout(a); list.setOrientation(LinearLayout.VERTICAL);
         sv.addView(list); root.addView(sv,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0,1f));
 
-        final int[] mode={0}; // 0 normal, 1 edit, 2 delete
         final Runnable[] reload=new Runnable[1];
         reload[0]=()->{
             list.removeAllViews();
@@ -75,14 +67,21 @@ public final class FavoritesDialog {
                 info.addView(text(a,(f.getName()==null||f.getName().trim().isEmpty())?"موقع محفوظ":f.getName(),14,WHITE,true));
                 info.addView(text(a,String.format(Locale.US,"%.6f, %.6f",f.getLatitude(),f.getLongitude()),11,MUTED,false));
                 card.addView(info,new LinearLayout.LayoutParams(0,ViewGroup.LayoutParams.WRAP_CONTENT,1f));
-                if(mode[0]==1){
-                    Button e=button(a,"تعديل",BLUE,WHITE); e.setOnClickListener(v->edit(a,f,reload[0]));
-                    card.addView(e,new LinearLayout.LayoutParams(dp(a,72),dp(a,38)));
-                }else if(mode[0]==2){
-                    Button x=button(a,"حذف",RED,WHITE); x.setOnClickListener(v->{
+                ImageButton pencil=icon(a,android.R.drawable.ic_menu_edit,BLUE);
+                pencil.setContentDescription("تعديل " + f.getName());
+                pencil.setOnClickListener(v->edit(a,f,reload[0]));
+                card.addView(pencil,new LinearLayout.LayoutParams(dp(a,48),dp(a,48)));
+                ImageButton trash=icon(a,android.R.drawable.ic_menu_delete,RED);
+                trash.setContentDescription("حذف " + f.getName());
+                trash.setOnClickListener(v->new AlertDialog.Builder(a)
+                    .setTitle("حذف الموقع")
+                    .setMessage("حذف «" + f.getName() + "» من المفضلة؟")
+                    .setNegativeButton("إلغاء",null)
+                    .setPositiveButton("حذف",(which,button)->{
                         WFStorage.getInstance(a).deleteFavorite(f.getId()); reload[0].run();
-                    }); card.addView(x,new LinearLayout.LayoutParams(dp(a,72),dp(a,38)));
-                }else card.setOnClickListener(v->{
+                    }).show());
+                card.addView(trash,new LinearLayout.LayoutParams(dp(a,48),dp(a,48)));
+                card.setOnClickListener(v->{
                     if(GPSMockManager.getInstance().selectAndStart(f.toWFLocation())){
                         Toast.makeText(a,"تم اختيار وتشغيل الموقع: "+f.getName(),Toast.LENGTH_SHORT).show();
                         d.dismiss(); WolFoxPanel.show(a);
@@ -94,21 +93,9 @@ public final class FavoritesDialog {
         };
         reload[0].run();
 
-        Button manage=button(a,"تحرير المواقع المحفوظة",CARD2,WHITE);
-        manage.setOnClickListener(v->{mode[0]=0;reload[0].run();});
-        root.addView(manage,full(dp(a,42)));
-
-        LinearLayout modes=new LinearLayout(a);
-        Button editMode=button(a,"تعديل المواقع المحفوظة",BLUE,WHITE);
-        Button deleteMode=button(a,"حذف المواقع المحفوظة",RED,WHITE);
-        editMode.setOnClickListener(v->{mode[0]=1;reload[0].run();});
-        deleteMode.setOnClickListener(v->{mode[0]=2;reload[0].run();});
-        modes.addView(editMode,weight(a,42,6)); modes.addView(deleteMode,weight(a,42,0));
-        LinearLayout.LayoutParams mp=fullWrap();mp.setMargins(0,dp(a,6),0,0);root.addView(modes,mp);
-
         WFTheme.applyTree(root); d.setContentView(root); d.show();
-        if(d.getWindow()!=null)d.getWindow().setLayout((int)(a.getResources().getDisplayMetrics().widthPixels*.92f),
-                (int)(a.getResources().getDisplayMetrics().heightPixels*.72f));
+        if(d.getWindow()!=null)d.getWindow().setLayout((int)(a.getResources().getDisplayMetrics().widthPixels*.88f),
+                (int)(a.getResources().getDisplayMetrics().heightPixels*.45f));
     }
 
     private static void edit(Activity a,FavoriteLocation f,Runnable reload){
@@ -117,11 +104,14 @@ public final class FavoritesDialog {
                 .setPositiveButton("حفظ",(x,w)->{String n=name.getText().toString().trim();if(!n.isEmpty()){f.setName(n);WFStorage.getInstance(a).updateFavorite(f);reload.run();}}).show();
     }
 
+    private static ImageButton icon(Context c,int resource,int color){
+        ImageButton b=new ImageButton(c);b.setImageResource(resource);b.setColorFilter(color);
+        b.setPadding(dp(c,12),dp(c,12),dp(c,12),dp(c,12));
+        b.setBackground(round(CARD,12,0xFF28547E,1));return b;
+    }
     private static TextView text(Context c,String s,int z,int color,boolean bold){TextView v=new TextView(c);v.setText(s);v.setTextSize(z);v.setTextColor(color);WFTheme.apply(v,bold);return v;}
     private static Button button(Context c,String s,int bg,int color){Button b=new Button(c);b.setAllCaps(false);b.setText(s);b.setTextSize(12);b.setTextColor(color);b.setBackground(round(bg,12,0xFF28547E,1));WFTheme.apply(b,true);return b;}
     private static GradientDrawable round(int fill,int radius,int stroke,int sw){GradientDrawable g=new GradientDrawable();g.setColor(fill);g.setCornerRadius(radius*2f);if(sw>0)g.setStroke(sw,stroke);return g;}
-    private static LinearLayout.LayoutParams full(int h){return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,h);}
     private static LinearLayout.LayoutParams fullWrap(){return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);}
-    private static LinearLayout.LayoutParams weight(Context c,int h,int m){LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(c,h),1f);p.setMargins(0,0,dp(c,m),0);return p;}
     private static int dp(Context c,int v){return Math.round(v*c.getResources().getDisplayMetrics().density);}
 }

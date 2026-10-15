@@ -1,6 +1,7 @@
 package com.wolfox.gps.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +23,7 @@ import com.wolfox.gps.manager.FloatingManager;
 import com.wolfox.gps.manager.GPSMockManager;
 import com.wolfox.gps.manager.LicenseManager;
 import com.wolfox.gps.model.WFLocation;
+import com.wolfox.gps.model.FavoriteLocation;
 import com.wolfox.gps.util.WFStorage;
 import com.wolfox.gps.util.WFTheme;
 
@@ -138,14 +141,16 @@ public final class WolFoxPanel {
                     dialog.dismiss();
                     FavoritesDialog.show(activity);
                 }),
+                action(activity, WFTheme.icon("＋") + "  حفظ الموقع", v -> saveCurrentLocation(activity))));
+
+        root.addView(row(activity,
                 action(activity, WFTheme.icon("⚙") + "  الإعدادات", v -> {
                     dialog.dismiss();
                     SettingsDialog.show(activity);
-                })));
+                }),
 
-        Button hideIcon = action(activity, WFTheme.icon("○") + "  إخفاء الأيقونة",
-                v -> FloatingManager.getInstance().requestHideConfirmation(activity));
-        root.addView(hideIcon, full(dp(activity, 44)));
+                action(activity, WFTheme.icon("○") + "  إخفاء الأيقونة",
+                        v -> FloatingManager.getInstance().requestHideConfirmation(activity))));
 
         TextView footer = text(activity,
                 "اضغط على بطاقة الإحداثيات لنسخها  •  v" + ModuleConfig.VERSION_NAME,
@@ -162,6 +167,35 @@ public final class WolFoxPanel {
             if (currentDialog == dialog) currentDialog = null;
         });
         return dialog;
+    }
+
+    private static void saveCurrentLocation(Activity activity) {
+        WFLocation location = GPSMockManager.getInstance().getLocation();
+        if (location == null || !location.isValid()) {
+            Toast.makeText(activity, "حدد موقعًا من الخريطة أولًا", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final double latitude = location.getLatitude(), longitude = location.getLongitude();
+        EditText name = new EditText(activity);
+        name.setHint("اسم الموقع");
+        name.setSingleLine(true);
+        name.setGravity(Gravity.CENTER);
+        name.setTextColor(WHITE);
+        name.setHintTextColor(MUTED);
+        WFTheme.apply(name, true);
+        LinearLayout box = new LinearLayout(activity);
+        box.setPadding(dp(activity, 18), dp(activity, 8), dp(activity, 18), 0);
+        box.addView(name, full(dp(activity, 48)));
+        AlertDialog save = new AlertDialog.Builder(activity).setTitle("حفظ الموقع")
+                .setView(box).setNegativeButton("إلغاء", null).setPositiveButton("حفظ", null).create();
+        save.setOnShowListener(ignored -> save.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String label = name.getText().toString().trim();
+            if (label.isEmpty()) { name.setError("أدخل اسم الموقع"); return; }
+            WFStorage.getInstance(activity).addFavorite(new FavoriteLocation(label, latitude, longitude));
+            Toast.makeText(activity, "تم حفظ الموقع في المفضلة", Toast.LENGTH_SHORT).show();
+            save.dismiss();
+        }));
+        save.show();
     }
 
     private static View header(Context context, Dialog dialog) {

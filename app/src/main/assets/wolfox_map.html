@@ -14,9 +14,13 @@
     #tiles { position:absolute; inset:0; will-change:transform; }
     .tile { position:absolute; width:256px; height:256px; border:0; user-select:none; -webkit-user-drag:none; }
     .labels { z-index:2; background:transparent; }
-    #crosshair { position:absolute; left:50%; top:50%; width:30px; height:30px; margin:-15px 0 0 -15px;
-      z-index:20; pointer-events:none; color:#ff2d2d; font-size:32px; line-height:27px; text-align:center;
-      text-shadow:0 1px 3px #000; }
+    #pin { position:absolute; left:50%; top:50%; width:36px; height:48px; margin:-48px 0 0 -18px;
+      z-index:20; pointer-events:none; transform-origin:50% 100%; filter:drop-shadow(0 3px 4px rgba(0,0,0,.55)); }
+    #pin svg { width:100%; height:100%; display:block; }
+    #pin path { fill:#e8202a; transition:fill .2s ease; }
+    body.spoof #pin path { fill:#22c55e; }
+    #pin.drop { animation:pinDrop .25s ease-out; }
+    @keyframes pinDrop { from { transform:translateY(-12px); opacity:.45; } to { transform:translateY(0); opacity:1; } }
     #search { position:absolute; z-index:30; top:10px; left:50%; transform:translateX(-50%);
       width:calc(100% - 92px); max-width:430px; height:44px; display:flex; direction:rtl;
       background:#071426ee; border:1px solid #2787f5; border-radius:22px; overflow:hidden; }
@@ -36,13 +40,13 @@
     #credit { position:absolute; z-index:25; left:5px; bottom:3px; color:#fff; font-size:9px;
       padding:2px 5px; background:#071426aa; direction:ltr; }
     body.preview #search, body.preview #zoom, body.preview #coords, body.preview #credit { display:none; }
-    body.preview #crosshair { width:24px; height:24px; margin:-12px 0 0 -12px; font-size:26px; line-height:22px; }
+    body.preview #pin { width:26px; height:35px; margin:-35px 0 0 -13px; }
     body.preview #status { max-width:78%; white-space:normal; text-align:center; font-size:11px; padding:7px 10px; }
   </style>
 </head>
 <body>
   <div id="map"><div id="tiles"></div></div>
-  <div id="crosshair">＋</div>
+  <div id="pin"><svg viewBox="0 0 36 48" xmlns="http://www.w3.org/2000/svg"><path d="M18 47C18 47 2 29.5 2 17.5C2 8.4 9.2 1.5 18 1.5S34 8.4 34 17.5C34 29.5 18 47 18 47Z" stroke="#fff" stroke-width="2.2"/><circle cx="18" cy="17.5" r="6.2" fill="#fff"/></svg></div>
   <form id="search"><input id="query" placeholder="عنوان، إحداثيات، أو رابط خريطة"><button type="submit">⌕︎</button></form>
   <div id="zoom"><button id="zoomIn" type="button">＋</button><button id="zoomOut" type="button">−</button></div>
   <div id="coords"></div>
@@ -54,7 +58,9 @@
     'use strict';
     var params = new URLSearchParams(location.search);
     var preview = params.get('preview') === '1';
+    var spoof = params.get('spoof') === '1';
     if (preview) document.body.classList.add('preview');
+    if (spoof) document.body.classList.add('spoof');
     var selectedLat = clampLat(parseFloat(params.get('lat')) || 24.7136);
     var selectedLng = wrapLng(parseFloat(params.get('lng')) || 46.6753);
     var mapType = params.get('type') === 'satellite' ? 'satellite' : 'roadmap';
@@ -64,6 +70,7 @@
     var tiles = document.getElementById('tiles');
     var coords = document.getElementById('coords');
     var status = document.getElementById('status');
+    var pin = document.getElementById('pin');
     var firstTileLoaded = false;
     var drag = null;
 
@@ -195,6 +202,7 @@
       selectedLat = target.lat;
       selectedLng = target.lng;
       drag = null;
+      pin.classList.remove('drop'); void pin.offsetWidth; pin.classList.add('drop');
       render();
       if (event.cancelable) event.preventDefault();
     }
@@ -274,6 +282,9 @@
     };
 
     window.getSelectedLocation = function () { return [selectedLat, selectedLng]; };
+    window.setSpoofActive = function (active) {
+      document.body.classList.toggle('spoof', !!active);
+    };
     window.centerMap = function (lat, lng) {
       if (!isFinite(lat) || !isFinite(lng)) return;
       selectedLat = clampLat(Number(lat));

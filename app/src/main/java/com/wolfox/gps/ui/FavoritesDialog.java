@@ -25,7 +25,7 @@ import java.util.Locale;
 public final class FavoritesDialog {
     private static final int BG=0xFF071426, CARD=0xFF0D203B, CARD2=0xFF123052;
     private static final int BLUE=0xFF2787F5, WHITE=0xFFF4F8FF, MUTED=0xFF97ABC5;
-    private static final int RED=0xFFFF5563, GREEN=0xFF36D783;
+    private static final int RED=0xFFFF5563;
 
     private FavoritesDialog(){}
 
@@ -106,29 +106,9 @@ public final class FavoritesDialog {
         modes.addView(editMode,weight(a,42,6)); modes.addView(deleteMode,weight(a,42,0));
         LinearLayout.LayoutParams mp=fullWrap();mp.setMargins(0,dp(a,6),0,0);root.addView(modes,mp);
 
-        Button add=button(a,"＋  إضافة موقع جديد",GREEN,BG);
-        add.setOnClickListener(v->addCurrent(a,reload[0]));
-        LinearLayout.LayoutParams ap=full(dp(a,46));ap.setMargins(0,dp(a,6),0,0);root.addView(add,ap);
-
         WFTheme.applyTree(root); d.setContentView(root); d.show();
         if(d.getWindow()!=null)d.getWindow().setLayout((int)(a.getResources().getDisplayMetrics().widthPixels*.92f),
                 (int)(a.getResources().getDisplayMetrics().heightPixels*.72f));
-    }
-
-    private static void addCurrent(Activity a,Runnable reload){
-        WFLocation loc=GPSMockManager.getInstance().getLocation();
-        if(loc==null||!loc.isValid()){Toast.makeText(a,"حدد موقعًا من الخريطة أولًا",Toast.LENGTH_SHORT).show();return;}
-        EditText name=new EditText(a); name.setHint("اسم الموقع"); name.setSingleLine(true);
-        name.setTextColor(WHITE);name.setHintTextColor(MUTED);name.setGravity(Gravity.CENTER);
-        name.setBackground(round(CARD,12,0xFF28547E,1));name.setPadding(dp(a,10),0,dp(a,10),0);
-        LinearLayout box=new LinearLayout(a);box.setPadding(dp(a,18),dp(a,8),dp(a,18),0);box.addView(name,full(dp(a,46)));
-        new AlertDialog.Builder(a).setTitle("حفظ الموقع").setView(box)
-                .setNegativeButton("إلغاء",null).setPositiveButton("حفظ",(x,w)->{
-                    String n=name.getText().toString().trim();
-                    if(n.isEmpty()){Toast.makeText(a,"أدخل اسم الموقع",Toast.LENGTH_SHORT).show();return;}
-                    WFStorage.getInstance(a).addFavorite(new FavoriteLocation(n,loc.getLatitude(),loc.getLongitude()));
-                    reload.run();Toast.makeText(a,"تم حفظ الموقع",Toast.LENGTH_SHORT).show();
-                }).show();
     }
 
     private static void edit(Activity a,FavoriteLocation f,Runnable reload){

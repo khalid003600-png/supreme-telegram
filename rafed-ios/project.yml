@@ -1,0 +1,24 @@
+name: Rafed
+options:
+  bundleIdPrefix: app.lilac7003
+settings:
+  base:
+    IPHONEOS_DEPLOYMENT_TARGET: "15.0"
+    SWIFT_VERSION: "5.0"
+    PRODUCT_BUNDLE_IDENTIFIER: app.lilac7003.mint3477
+targets:
+  Rafed:
+    type: application
+    platform: iOS
+    sources: [Sources]
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: رافد
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGNING_ALLOWED: NO
+    scheme: {}

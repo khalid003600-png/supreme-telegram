@@ -78,6 +78,31 @@ final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDeleg
         if navigationAction.targetFrame == nil { webView.load(navigationAction.request) }
         return nil
     }
+    private func presentDialog(_ alert: UIAlertController, fallback: () -> Void) {
+        guard var presenter = web.window?.rootViewController else { fallback(); return }
+        while let presented = presenter.presentedViewController { presenter = presented }
+        guard presenter.viewIfLoaded?.window != nil else { fallback(); return }
+        presenter.present(alert, animated: true)
+    }
+    func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
+        let alert = UIAlertController(title: "رافد", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "موافق", style: .default) { _ in completionHandler() })
+        presentDialog(alert, fallback: completionHandler)
+    }
+    func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
+        let alert = UIAlertController(title: "رافد", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "إلغاء", style: .cancel) { _ in completionHandler(false) })
+        alert.addAction(UIAlertAction(title: "موافق", style: .default) { _ in completionHandler(true) })
+        presentDialog(alert) { completionHandler(false) }
+    }
+    func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Void) {
+        let alert = UIAlertController(title: "رافد", message: prompt, preferredStyle: .alert)
+        alert.addTextField { $0.text = defaultText }
+        alert.addAction(UIAlertAction(title: "إلغاء", style: .cancel) { _ in completionHandler(nil) })
+        alert.addAction(UIAlertAction(title: "موافق", style: .default) { [weak alert] _ in completionHandler(alert?.textFields?.first?.text ?? "") })
+        presentDialog(alert) { completionHandler(nil) }
+    }
+
 }
 struct WebSurface: UIViewRepresentable {
     let browser: Browser
@@ -98,7 +123,7 @@ struct BrowserScreen: View {
                         .background(.regularMaterial)
                         .cornerRadius(12)
                     Spacer()
-                }.padding()
+                }.padding().allowsHitTesting(false)
             }
             if let message = browser.errorMessage {
                 VStack(spacing: 16) {

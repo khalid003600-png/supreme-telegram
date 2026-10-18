@@ -1,51 +1,50 @@
-name: WolFox source-verified Android build
+name: WolFox source integrity and Android APK
 on:
-  workflow_dispatch:
   push:
     branches: [wolfox-current-structure-build]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
   build:
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+      - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
       - name: Install Android SDK packages
+        run: sdkmanager --install 'platforms;android-34' 'build-tools;34.0.0'
+      - name: Verify this is the WolFox GPS source
         shell: bash
         run: |
           set -euo pipefail
-          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
-          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -V | tail -1)"
-          test -x "$SDKMANAGER"
-          yes | "$SDKMANAGER" --licenses >/dev/null || true
-          "$SDKMANAGER" --install 'platforms;android-34' 'build-tools;34.0.0'
-      - name: Verify correct WolFox sources
+          grep -F "applicationId 'com.wolfox.gps'" app/build.gradle
+          test -s app/src/main/java/com/wolfox/gps/manager/FloatingManager.java
+          test -s app/src/main/java/com/wolfox/gps/manager/GPSMockManager.java
+          test -s tests-linux/check.sh
+      - name: Source regression checks
+        run: bash tests-linux/check.sh
+      - name: Test and build
+        run: gradle --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleDebug
+      - name: Verify APK signature and digest
         run: |
           set -euo pipefail
-          grep -F "applicationId 'com.wolfox.gps'" app/build.gradle
-          find app/src/main -name FloatingManager.java | grep -q .
-          find app/src/main -name GPSMockManager.java | grep -q .
-          test -f tests-linux/check.sh
-      - name: Linux source tests
-        run: bash tests-linux/check.sh
-      - name: Build APK
-        run: gradle --no-daemon :app:testDebugUnitTest :app:assembleDebug --stacktrace
-      - name: Verify APK
-        run: |
-          test -s app/build/outputs/apk/debug/app-debug.apk
-          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose app/build/outputs/apk/debug/app-debug.apk
-          sha256sum app/build/outputs/apk/debug/app-debug.apk > apk-sha256.txt
+          apk=app/build/outputs/apk/debug/app-debug.apk
+          test -s "$apk"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose "$apk"
+          sha256sum "$apk" | tee apk-sha256.txt
       - uses: actions/upload-artifact@v4
+        if: success()
         with:
-          name: wolfox-debug-apk
+          name: wolfox-gps-debug-apk
           path: |
-            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/debug/app-debug.apk
             apk-sha256.txt
           if-no-files-found: error

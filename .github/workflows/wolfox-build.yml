@@ -33,11 +33,16 @@ jobs:
           test -f app/src/main/java/com/wolfox/gps/manager/FloatingManager.java
           test -f app/src/main/java/com/wolfox/gps/manager/GPSMockManager.java
           bash tests-linux/check.sh
-      - name: Compile and test with preserved logs
+      - name: Compile and package APK
         shell: bash
         run: |
           set -o pipefail
-          gradle --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleDebug 2>&1 | tee wolfox-gradle-build.log
+          gradle --no-daemon --stacktrace :app:assembleDebug 2>&1 | tee wolfox-gradle-build.log
+      - name: Run Android unit tests
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle --no-daemon --stacktrace :app:testDebugUnitTest 2>&1 | tee wolfox-gradle-tests.log
       - name: Verify signed APK and hashes
         shell: bash
         run: |
@@ -53,6 +58,7 @@ jobs:
           name: wolfox-build-diagnostics
           path: |
             wolfox-gradle-build.log
+            wolfox-gradle-tests.log
             app/build/reports/tests/
             app/build/test-results/
           if-no-files-found: warn

@@ -13,7 +13,7 @@ targets:
     sources: [Sources, Assets.xcassets]
     preBuildScripts:
       - name: Decode app icon
-        script: 'base64 --decode "$SRCROOT/AppIcon.png.base64" > "$SRCROOT/Assets.xcassets/AppIcon.appiconset/AppIcon.png"'
+        script: 'base64 --decode -i "$SRCROOT/AppIcon.png.base64" > "$SRCROOT/Assets.xcassets/AppIcon.appiconset/AppIcon.png"'
         basedOnDependencyAnalysis: false
     info:
       path: Info.plist

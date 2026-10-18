@@ -1,16 +1,20 @@
 import SwiftUI
 import WebKit
+import CoreLocation
 
 @main struct RafedApp: App {
     var body: some Scene { WindowGroup { BrowserScreen().preferredColorScheme(.light) } }
 }
-final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDelegate {
+final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDelegate, CLLocationManagerDelegate {
     let web: WKWebView
     @Published var errorMessage: String?
     @Published var isLoading = true
     @Published var progress = 0.0
     @Published var canGoBack = false
     @Published var canGoForward = false
+    private let locationManager = CLLocationManager()
+    @Published var locationStatus: CLAuthorizationStatus = .notDetermined
+    @Published var locationMessage = "إذن الموقع لم يُطلب بعد"
     private var observations: [NSKeyValueObservation] = []
     private var loadTimeout: DispatchWorkItem?
     override init() {
@@ -18,6 +22,8 @@ final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDeleg
         config.websiteDataStore = .default()
         web = WKWebView(frame: .zero, configuration: config)
         super.init()
+        locationManager.delegate = self
+        updateLocationStatus()
         web.overrideUserInterfaceStyle = .light
         web.isOpaque = false
         web.backgroundColor = .white
@@ -39,6 +45,37 @@ final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDeleg
                 DispatchQueue.main.async { self?.canGoForward = value }
             }
         ]
+    }
+    func updateLocationStatus() {
+        locationStatus = locationManager.authorizationStatus
+        switch locationStatus {
+        case .authorizedAlways, .authorizedWhenInUse:
+            locationMessage = locationManager.accuracyAuthorization == .fullAccuracy
+                ? "الموقع مسموح — دقة كاملة" : "الموقع مسموح — دقة تقريبية"
+        case .denied: locationMessage = "إذن الموقع مرفوض — فعّله من الإعدادات"
+        case .restricted: locationMessage = "إذن الموقع مقيد بإعدادات الجهاز"
+        case .notDetermined: locationMessage = "السماح بالموقع أثناء استخدام التطبيق"
+        @unknown default: locationMessage = "تحقق من إعدادات الموقع"
+        }
+    }
+    func requestLocationIfNeeded() {
+        updateLocationStatus()
+        if locationStatus == .notDetermined {
+            locationManager.requestWhenInUseAuthorization()
+        }
+    }
+    func locationButtonTapped() {
+        updateLocationStatus()
+        if locationStatus == .denied {
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        } else if locationStatus == .notDetermined {
+            locationManager.requestWhenInUseAuthorization()
+        }
+    }
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        updateLocationStatus()
     }
     func back() { errorMessage = nil; web.goBack() }
     func forward() { errorMessage = nil; web.goForward() }
@@ -135,6 +172,7 @@ struct WebSurface: UIViewRepresentable {
 }
 struct BrowserScreen: View {
     @StateObject private var browser = Browser()
+    @Environment(\.scenePhase) private var scenePhase
     private let accent = Color(red: 0.08, green: 0.29, blue: 0.39)
     var body: some View {
         VStack(spacing: 0) {
@@ -163,6 +201,20 @@ struct BrowserScreen: View {
                 }
             }
             Divider()
+            HStack(spacing: 12) {
+                Button { browser.locationButtonTapped() } label: {
+                    Label("الموقع", systemImage: "location")
+                        .frame(minHeight: 44)
+                }
+                Text(browser.locationMessage)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            .tint(accent)
+            .padding(.horizontal, 16)
+            .background(Color.white)
+            Divider()
             HStack {
                 Button { browser.back() } label: {
                     Label("رجوع", systemImage: "chevron.left")
@@ -186,6 +238,12 @@ struct BrowserScreen: View {
             .background(Color.white)
         }
         .background(Color.white.ignoresSafeArea())
-        .onAppear { browser.startIfNeeded() }
+        .onAppear {
+            browser.startIfNeeded()
+            browser.requestLocationIfNeeded()
+        }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active { browser.updateLocationStatus() }
+        }
     }
 }

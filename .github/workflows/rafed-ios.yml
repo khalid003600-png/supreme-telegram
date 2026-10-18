@@ -1,0 +1,68 @@
+name: Rafed iOS IPA
+on:
+  push:
+    branches: [rafed-ios-20261018]
+    paths: ['rafed-ios/**', '.github/workflows/rafed-ios.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate project
+        run: |
+          brew install xcodegen
+          cd rafed-ios
+          xcodegen generate
+      - name: Build device application
+        run: |
+          xcodebuild -project rafed-ios/Rafed.xcodeproj -scheme Rafed -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
+      - name: Sign and package
+        env:
+          P12: ${{ secrets.IOS_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
+          PROFILE: ${{ secrets.IOS_PROFILE_BASE64 }}
+        run: |
+          set -euo pipefail
+          mkdir -p output
+          APP=build/Build/Products/Release-iphoneos/Rafed.app
+          if [ -z "$P12" ] || [ -z "$PROFILE" ]; then
+            ditto -c -k --keepParent "$APP" output/Rafed-unsigned-app.zip
+            echo "Signing secrets missing. Uploaded unsigned app only; no installable IPA." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          CERT="$RUNNER_TEMP/cert.p12"
+          MOBILE="$RUNNER_TEMP/profile.mobileprovision"
+          KEYCHAIN="$RUNNER_TEMP/rafed.keychain-db"
+          echo "$P12" | base64 --decode > "$CERT"
+          echo "$PROFILE" | base64 --decode > "$MOBILE"
+          KEY_PASS=$(openssl rand -hex 24)
+          security create-keychain -p "$KEY_PASS" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEY_PASS" "$KEYCHAIN"
+          security import "$CERT" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEY_PASS" "$KEYCHAIN"
+          security cms -D -i "$MOBILE" > "$RUNNER_TEMP/profile.plist"
+          /usr/libexec/PlistBuddy -x -c 'Print :Entitlements' "$RUNNER_TEMP/profile.plist" > "$RUNNER_TEMP/entitlements.plist"
+          IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN" | awk '/"/ {print $2; exit}')
+          test -n "$IDENTITY"
+          cp "$MOBILE" "$APP/embedded.mobileprovision"
+          codesign --force --sign "$IDENTITY" --keychain "$KEYCHAIN" --entitlements "$RUNNER_TEMP/entitlements.plist" "$APP"
+          codesign --verify --deep --strict "$APP"
+          mkdir -p package/Payload
+          cp -R "$APP" package/Payload/
+          (cd package && zip -qr ../output/Rafed.ipa Payload)
+          echo "Signed Rafed.ipa produced. Installation and website operation still require device validation." >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rafed-iOS
+          path: output/*
+          if-no-files-found: error
+      - name: Clean signing files
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/rafed.keychain-db" 2>/dev/null || true
+          rm -f "$RUNNER_TEMP/cert.p12" "$RUNNER_TEMP/profile.mobileprovision" "$RUNNER_TEMP/profile.plist" "$RUNNER_TEMP/entitlements.plist"

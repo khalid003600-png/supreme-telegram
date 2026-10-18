@@ -2,7 +2,7 @@ import SwiftUI
 import WebKit
 
 @main struct RafedApp: App {
-    var body: some Scene { WindowGroup { BrowserScreen() } }
+    var body: some Scene { WindowGroup { BrowserScreen().preferredColorScheme(.light) } }
 }
 final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDelegate {
     let web: WKWebView
@@ -14,6 +14,7 @@ final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDeleg
         config.websiteDataStore = .default()
         web = WKWebView(frame: .zero, configuration: config)
         super.init()
+        web.overrideUserInterfaceStyle = .light
         web.navigationDelegate = self
         web.uiDelegate = self
         web.allowsBackForwardNavigationGestures = true

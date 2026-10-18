@@ -10,7 +10,11 @@ targets:
   Rafed:
     type: application
     platform: iOS
-    sources: [Sources]
+    sources: [Sources, Assets.xcassets]
+    preBuildScripts:
+      - name: Decode app icon
+        script: 'base64 --decode "$SRCROOT/AppIcon.png.base64" > "$SRCROOT/Assets.xcassets/AppIcon.appiconset/AppIcon.png"'
+        basedOnDependencyAnalysis: false
     info:
       path: Info.plist
       properties:
@@ -20,5 +24,6 @@ targets:
     settings:
       base:
         TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGNING_ALLOWED: NO
     scheme: {}

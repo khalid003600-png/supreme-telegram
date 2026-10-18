@@ -1,0 +1,257 @@
+{
+  "project": "/home/ubuntu/wolfox-module-merge/WolFox-GPS-UIAudit",
+  "test_totals": {
+    "tests": 80,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "suites": [
+    {
+      "name": "com.wolfox.gps.manager.EmbeddedHostFloatingTest",
+      "seconds": 2.119,
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.manager.FloatingManagerLifecycleTest",
+      "seconds": 2.871,
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.manager.GPSMockManagerRegressionTest",
+      "seconds": 0.133,
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.manager.LocalLicenseStateRegressionTest",
+      "seconds": 0.112,
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.manager.UiAuditlifecycleStressTest",
+      "seconds": 0.877,
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.manager.UiAuditstateStorageAndRuntimeTest",
+      "seconds": 0.181,
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.ui.ColorAndCloseLayoutTest",
+      "seconds": 0.181,
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.ui.SearchDialogLayoutTest",
+      "seconds": 0.936,
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.ui.SelectedLocationStateTest",
+      "seconds": 0.173,
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.ui.UiAuditMapSearchLifecycleTest",
+      "seconds": 0.672,
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.ui.UiAuditdialogsLayoutTest",
+      "seconds": 1.734,
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.ui.WFDesignButtonTest",
+      "seconds": 1.538,
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.ui.WolFoxPanelSpoofButtonRegressionTest",
+      "seconds": 0.613,
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.util.MapLinkParserRegressionTest",
+      "seconds": 0.004,
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.util.UiAuditModuleFontAssetsTest",
+      "seconds": 3.424,
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.util.UiAuditTextTemplatesTest",
+      "seconds": 0.001,
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.util.UiAuditplatformHostRoutingTest",
+      "seconds": 0.101,
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    },
+    {
+      "name": "com.wolfox.gps.util.WFHostPolicyTest",
+      "seconds": 0.003,
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failures_detail": []
+    }
+  ],
+  "baseline_issue_count": 46,
+  "baseline_by_id": {
+    "ApplySharedPref": 5,
+    "DefaultLocale": 1,
+    "DiscouragedPrivateApi": 1,
+    "InlinedApi": 1,
+    "OldTargetApi": 1,
+    "PrivateApi": 1,
+    "UnusedAttribute": 2,
+    "QueryPermissionsNeeded": 1,
+    "HardwareIds": 1,
+    "SetJavaScriptEnabled": 1,
+    "DataExtractionRules": 1,
+    "ObsoleteSdkInt": 5,
+    "StaticFieldLeak": 2,
+    "MissingApplicationIcon": 1,
+    "ClickableViewAccessibility": 1,
+    "ConstantLocale": 1,
+    "SetTextI18n": 18,
+    "RtlHardcoded": 2
+  },
+  "current_issue_count": 3,
+  "current_by_id": {
+    "OldTargetApi": 1,
+    "HardwareIds": 1,
+    "SetJavaScriptEnabled": 1
+  },
+  "current_by_severity": {
+    "Warning": 3
+  },
+  "remaining_issues": [
+    {
+      "id": "OldTargetApi",
+      "severity": "Warning",
+      "message": "Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details.",
+      "locations": [
+        {
+          "file": "/home/ubuntu/wolfox-module-merge/WolFox-GPS-UIAudit/app/build.gradle",
+          "line": "13",
+          "column": "9"
+        }
+      ]
+    },
+    {
+      "id": "HardwareIds",
+      "severity": "Warning",
+      "message": "Using `getString` to get device identifiers is not recommended",
+      "locations": [
+        {
+          "file": "/home/ubuntu/wolfox-module-merge/WolFox-GPS-UIAudit/app/src/main/java/com/wolfox/gps/manager/LicenseManager.java",
+          "line": "320",
+          "column": "28"
+        }
+      ]
+    },
+    {
+      "id": "SetJavaScriptEnabled",
+      "severity": "Warning",
+      "message": "Using `setJavaScriptEnabled` can introduce XSS vulnerabilities into your application, review carefully",
+      "locations": [
+        {
+          "file": "/home/ubuntu/wolfox-module-merge/WolFox-GPS-UIAudit/app/src/main/java/com/wolfox/gps/ui/MapDialog.java",
+          "line": "407",
+          "column": "9"
+        }
+      ]
+    }
+  ],
+  "apk_files": [
+    {
+      "path": "/home/ubuntu/wolfox-module-merge/WolFox-GPS-UIAudit/build/local/apk/WolFox_GPS_Module_v3.1.1_test_SIGNED.apk",
+      "bytes": 648475,
+      "sha256": "586164ea04f3af5b92413d4aa9b5f6c0f454270d0b1b8ec4aa9341047915ea02"
+    }
+  ],
+  "limits": [
+    "Robolectric tests are local simulations, not physical-device frame measurements.",
+    "Raw warnings are retained; no zero-warning guarantee is inferred from successful tests.",
+    "No host APK or production activation server is executed by this report."
+  ],
+  "certificate_sha256": "d3c6e8100a52f148cd75cc875a7cb7ea28c8004e45b5bd22b399e119f5e47c96",
+  "renamed_classes": 212,
+  "lspatch_contract_passed": true,
+  "dex_sha256": "724e45e7dd4f96e342eebbd33f74af9e8427753810ca339fb2ba77b1cfb495b8"
+}

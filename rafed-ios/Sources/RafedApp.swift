@@ -8,6 +8,10 @@ final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDeleg
     let web: WKWebView
     @Published var errorMessage: String?
     @Published var isLoading = true
+    @Published var progress = 0.0
+    @Published var canGoBack = false
+    @Published var canGoForward = false
+    private var observations: [NSKeyValueObservation] = []
     private var loadTimeout: DispatchWorkItem?
     override init() {
         let config = WKWebViewConfiguration()
@@ -21,6 +25,26 @@ final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDeleg
         web.navigationDelegate = self
         web.uiDelegate = self
         web.allowsBackForwardNavigationGestures = true
+        observations = [
+            web.observe(\.estimatedProgress, options: [.initial, .new]) { [weak self] view, _ in
+                let value = view.estimatedProgress
+                DispatchQueue.main.async { self?.progress = value }
+            },
+            web.observe(\.canGoBack, options: [.initial, .new]) { [weak self] view, _ in
+                let value = view.canGoBack
+                DispatchQueue.main.async { self?.canGoBack = value }
+            },
+            web.observe(\.canGoForward, options: [.initial, .new]) { [weak self] view, _ in
+                let value = view.canGoForward
+                DispatchQueue.main.async { self?.canGoForward = value }
+            }
+        ]
+    }
+    func back() { errorMessage = nil; web.goBack() }
+    func forward() { errorMessage = nil; web.goForward() }
+    func refresh() {
+        errorMessage = nil
+        if web.url == nil { home() } else { web.reload() }
     }
     func startIfNeeded() { if web.url == nil && !web.isLoading { home() } }
     func home() {
@@ -111,34 +135,57 @@ struct WebSurface: UIViewRepresentable {
 }
 struct BrowserScreen: View {
     @StateObject private var browser = Browser()
+    private let accent = Color(red: 0.08, green: 0.29, blue: 0.39)
     var body: some View {
-        ZStack {
-            Color.white.ignoresSafeArea()
-            WebSurface(browser: browser)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            if browser.isLoading && browser.errorMessage == nil {
-                VStack {
-                    ProgressView("جارٍ فتح رافد…")
-                        .padding()
-                        .background(.regularMaterial)
-                        .cornerRadius(12)
-                    Spacer()
-                }.padding().allowsHitTesting(false)
-            }
-            if let message = browser.errorMessage {
-                VStack(spacing: 16) {
-                    Image(systemName: "exclamationmark.triangle").font(.title)
-                    Text(message).multilineTextAlignment(.center)
-                    Button("إعادة المحاولة") { browser.home() }
+        VStack(spacing: 0) {
+            ProgressView(value: browser.progress, total: 1)
+                .progressViewStyle(.linear)
+                .tint(accent)
+                .opacity(browser.isLoading ? 1 : 0)
+                .frame(height: 3)
+                .accessibilityLabel("تقدم تحميل الصفحة")
+            ZStack {
+                Color.white
+                WebSurface(browser: browser)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                if let message = browser.errorMessage {
+                    VStack(spacing: 16) {
+                        Image(systemName: "exclamationmark.triangle").font(.title)
+                        Text(message).multilineTextAlignment(.center)
+                        Button("إعادة المحاولة") { browser.refresh() }
+                    }
+                    .foregroundColor(.black)
+                    .padding(24)
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .shadow(radius: 8)
+                    .padding()
                 }
-                .foregroundColor(.black)
-                .padding(24)
-                .background(Color.white)
-                .cornerRadius(16)
-                .shadow(radius: 8)
-                .padding()
             }
+            Divider()
+            HStack {
+                Button { browser.back() } label: {
+                    Label("رجوع", systemImage: "chevron.left")
+                        .frame(minWidth: 72, minHeight: 44)
+                }.disabled(!browser.canGoBack)
+                Spacer(minLength: 8)
+                Button { browser.forward() } label: {
+                    Label("تقدم", systemImage: "chevron.right")
+                        .frame(minWidth: 72, minHeight: 44)
+                }.disabled(!browser.canGoForward)
+                Spacer(minLength: 8)
+                Button { browser.refresh() } label: {
+                    Label("تحديث", systemImage: "arrow.clockwise")
+                        .frame(minWidth: 72, minHeight: 44)
+                }
+            }
+            .font(.subheadline)
+            .tint(accent)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 4)
+            .background(Color.white)
         }
+        .background(Color.white.ignoresSafeArea())
         .onAppear { browser.startIfNeeded() }
     }
 }

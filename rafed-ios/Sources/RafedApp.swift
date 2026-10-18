@@ -13,6 +13,8 @@ final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDeleg
     @Published var canGoBack = false
     @Published var canGoForward = false
     private let locationManager = CLLocationManager()
+    @Published var locationCheckInProgress = false
+    private var locationCheckID = UUID()
     @Published var locationStatus: CLAuthorizationStatus = .notDetermined
     @Published var locationMessage = "إذن الموقع لم يُطلب بعد"
     private var observations: [NSKeyValueObservation] = []
@@ -58,20 +60,103 @@ final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDeleg
         @unknown default: locationMessage = "تحقق من إعدادات الموقع"
         }
     }
+    private func checkLocationServices(_ completion: @escaping (Bool) -> Void) {
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            let enabled = CLLocationManager.locationServicesEnabled()
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                if !enabled {
+                    self.locationMessage = "خدمات الموقع معطلة على الجهاز — فعّلها من الخصوصية والأمان"
+                }
+                completion(enabled)
+            }
+        }
+    }
     func requestLocationIfNeeded() {
         updateLocationStatus()
-        if locationStatus == .notDetermined {
-            locationManager.requestWhenInUseAuthorization()
+        checkLocationServices { [weak self] enabled in
+            guard let self = self, enabled else { return }
+            if self.locationManager.authorizationStatus == .notDetermined {
+                self.locationManager.requestWhenInUseAuthorization()
+            }
         }
     }
     func locationButtonTapped() {
+        guard !locationCheckInProgress else { return }
         updateLocationStatus()
-        if locationStatus == .denied {
-            if let url = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(url)
+        checkLocationServices { [weak self] enabled in
+            guard let self = self, enabled else { return }
+            switch self.locationManager.authorizationStatus {
+            case .denied:
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            case .notDetermined:
+                self.locationManager.requestWhenInUseAuthorization()
+            case .restricted:
+                self.locationMessage = "إذن الموقع مقيد بإعدادات الجهاز"
+            case .authorizedAlways, .authorizedWhenInUse:
+                self.testPageLocation()
+            @unknown default: break
             }
-        } else if locationStatus == .notDetermined {
-            locationManager.requestWhenInUseAuthorization()
+        }
+    }
+    private func testPageLocation() {
+        guard let url = web.url, url.scheme == "https", url.host == "www.ibtsm.org",
+              !web.isLoading else {
+            locationMessage = "انتظر اكتمال فتح صفحة رافد ثم اضغط الموقع للفحص"
+            return
+        }
+        locationCheckInProgress = true
+        locationMessage = "جارٍ فحص تحديد الموقع داخل الصفحة…"
+        let checkID = UUID()
+        locationCheckID = checkID
+        let script = """
+        return await new Promise(resolve => {
+            let settled = false;
+            const finish = result => { if (!settled) { settled = true; clearTimeout(timer); resolve(result); } };
+            const timer = setTimeout(() => finish({ok:false, code:3}), 25000);
+            if (!window.isSecureContext) { finish({ok:false, code:4}); return; }
+            if (!navigator.geolocation) { finish({ok:false, code:5}); return; }
+            const policy = document.permissionsPolicy || document.featurePolicy;
+            if (policy && typeof policy.allowsFeature === 'function' && !policy.allowsFeature('geolocation')) {
+                finish({ok:false, code:6}); return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                position => finish({ok:true, accuracy:position.coords.accuracy}),
+                error => finish({ok:false, code:error.code}),
+                {enableHighAccuracy:true, timeout:15000, maximumAge:0}
+            );
+        });
+        """
+        web.callAsyncJavaScript(script, arguments: [:], in: nil, in: .page) { [weak self] result in
+            guard let self = self, self.locationCheckID == checkID else { return }
+            self.locationCheckInProgress = false
+            switch result {
+            case .failure:
+                self.locationMessage = "تعذر إكمال فحص الصفحة — حدّث الصفحة وأعد المحاولة"
+            case .success(let value):
+                guard let data = value as? [String: Any] else {
+                    self.locationMessage = "لم تُرجع الصفحة نتيجة صالحة للموقع"
+                    return
+                }
+                if data["ok"] as? Bool == true {
+                    let accuracy = (data["accuracy"] as? NSNumber)?.doubleValue ?? -1
+                    self.locationMessage = accuracy.isFinite && accuracy >= 0
+                        ? "نجح تحديد الموقع داخل الصفحة — الدقة نحو " + String(Int(min(accuracy, 1000000).rounded())) + " متر"
+                        : "نجح تحديد الموقع داخل الصفحة"
+                } else {
+                    switch (data["code"] as? NSNumber)?.intValue {
+                    case 1: self.locationMessage = "الصفحة رفضت إذن الموقع — تحقق من موافقة الموقع"
+                    case 2: self.locationMessage = "الموقع غير متاح حاليًا — تحقق من خدمات الموقع والإشارة"
+                    case 3: self.locationMessage = "انتهت مهلة تحديد الموقع — أعد المحاولة"
+                    case 4: self.locationMessage = "تحديد الموقع يتطلب صفحة HTTPS آمنة"
+                    case 5: self.locationMessage = "تحديد الموقع غير متاح في هذه الصفحة"
+                    case 6: self.locationMessage = "سياسة الصفحة تمنع تحديد الموقع"
+                    default: self.locationMessage = "تعذر تحديد الموقع داخل الصفحة"
+                    }
+                }
+            }
         }
     }
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -105,7 +190,12 @@ final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDeleg
         isLoading = false
         errorMessage = message
     }
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) { beginLoading() }
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        locationCheckID = UUID()
+        locationCheckInProgress = false
+        updateLocationStatus()
+        beginLoading()
+    }
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         loadTimeout?.cancel()
         isLoading = false
@@ -203,7 +293,7 @@ struct BrowserScreen: View {
             Divider()
             HStack(spacing: 12) {
                 Button { browser.locationButtonTapped() } label: {
-                    Label("الموقع", systemImage: "location")
+                    Label(browser.locationCheckInProgress ? "فحص…" : "الموقع", systemImage: "location")
                         .frame(minHeight: 44)
                 }
                 Text(browser.locationMessage)
@@ -211,6 +301,7 @@ struct BrowserScreen: View {
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
+            .disabled(browser.locationCheckInProgress)
             .tint(accent)
             .padding(.horizontal, 16)
             .background(Color.white)
@@ -243,7 +334,7 @@ struct BrowserScreen: View {
             browser.requestLocationIfNeeded()
         }
         .onChange(of: scenePhase) { phase in
-            if phase == .active { browser.updateLocationStatus() }
+            if phase == .active { browser.requestLocationIfNeeded() }
         }
     }
 }

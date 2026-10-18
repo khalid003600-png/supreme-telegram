@@ -19,6 +19,7 @@ targets:
       path: Info.plist
       properties:
         CFBundleDisplayName: رافد
+        NSLocationWhenInUseUsageDescription: "يستخدم رافد موقعك عند طلبه من الموقع وبعد موافقتك لتقديم الخدمات المرتبطة بالموقع."
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
     settings:

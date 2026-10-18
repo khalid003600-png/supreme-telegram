@@ -7,6 +7,8 @@ import WebKit
 final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDelegate {
     let web: WKWebView
     @Published var errorMessage: String?
+    @Published var pageBackground = UIColor.systemBackground
+    private var backgroundObservation: NSKeyValueObservation?
     override init() {
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .default()
@@ -15,6 +17,9 @@ final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDeleg
         web.navigationDelegate = self
         web.uiDelegate = self
         web.allowsBackForwardNavigationGestures = true
+        backgroundObservation = web.observe(\.underPageBackgroundColor, options: [.initial, .new]) { [weak self] webView, _ in
+            DispatchQueue.main.async { self?.pageBackground = webView.underPageBackgroundColor }
+        }
         home()
     }
     func home() { web.load(URLRequest(url: URL(string: "https://www.ibtsm.org/rafed/")!)) }
@@ -43,20 +48,19 @@ struct WebSurface: UIViewRepresentable {
 struct BrowserScreen: View {
     @StateObject private var browser = Browser()
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Button { browser.web.goBack() } label: { Image(systemName: "chevron.left") }.accessibilityLabel("رجوع")
-                Spacer()
-                Text("رافد").font(.headline)
-                Spacer()
-                Button { browser.home() } label: { Image(systemName: "house") }.accessibilityLabel("الرئيسية")
-                Button { browser.web.reload() } label: { Image(systemName: "arrow.clockwise") }.accessibilityLabel("تحديث")
-                Button { UIApplication.shared.open(URL(string: "https://www.ibtsm.org/rafed/")!) } label: { Image(systemName: "safari") }.accessibilityLabel("فتح في سفاري")
-            }.padding()
-            if let message = browser.errorMessage {
-                VStack { Text(message).multilineTextAlignment(.center); Button("إعادة المحاولة") { browser.home() } }.padding()
-            }
+        ZStack {
+            Color(uiColor: browser.pageBackground).ignoresSafeArea()
             WebSurface(browser: browser)
+            if let message = browser.errorMessage {
+                VStack(spacing: 16) {
+                    Text(message).multilineTextAlignment(.center)
+                    Button("إعادة المحاولة") { browser.home() }
+                }
+                .padding(24)
+                .background(.regularMaterial)
+                .cornerRadius(16)
+                .padding()
+            }
         }
     }
 }

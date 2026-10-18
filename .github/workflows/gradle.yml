@@ -43,7 +43,7 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
       with:
-        gradle-version: '8.7'
+        gradle-version: '8.9'
 
     - name: Debug repo contents
       run: |
@@ -63,7 +63,7 @@ jobs:
       run: |
         if [ ! -f ./gradlew ]; then
           echo "Gradle wrapper not found — generating with system Gradle"
-          gradle wrapper --gradle-version 8.7
+          gradle wrapper --gradle-version 8.9
           chmod +x gradlew
 
           # Commit generated wrapper back to repository so future runs have it.
@@ -125,7 +125,7 @@ jobs:
       run: |
         if [ ! -f ./gradlew ]; then
           echo "Gradle wrapper not found — generating with system Gradle"
-          gradle wrapper --gradle-version 8.7
+          gradle wrapper --gradle-version 8.9
           chmod +x gradlew
 
           # Commit generated wrapper back to repository so future runs have it.
@@ -148,4 +148,4 @@ jobs:
     - name: Generate and submit dependency graph
       uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
       with:
-        gradle-version: '8.7'
+        gradle-version: '8.9'

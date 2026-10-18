@@ -1,0 +1,46 @@
+name: WolFox source-verified Android build
+on:
+  workflow_dispatch:
+  push:
+    branches: [wolfox-current-structure-build]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Install Android SDK
+        run: sdkmanager --install 'platforms;android-34' 'build-tools;34.0.0'
+      - name: Verify WolFox source (never build unrelated app)
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F "applicationId 'com.wolfox.gps'" app/build.gradle
+          test -f app/src/main/java/com/wolfox/gps/manager/FloatingManager.java
+          test -f app/src/main/java/com/wolfox/gps/manager/GPSMockManager.java
+          test -f tests-linux/check.sh
+      - name: Linux source tests
+        run: bash tests-linux/check.sh
+      - name: Build APK
+        run: gradle --no-daemon :app:testDebugUnitTest :app:assembleDebug --stacktrace
+      - name: Verify APK signature
+        run: |
+          test -s app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose app/build/outputs/apk/debug/app-debug.apk
+          sha256sum app/build/outputs/apk/debug/app-debug.apk > apk-sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wolfox-debug-apk
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            apk-sha256.txt
+          if-no-files-found: error

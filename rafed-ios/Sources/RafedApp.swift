@@ -62,7 +62,7 @@ final class Browser: NSObject, ObservableObject, WKNavigationDelegate, WKUIDeleg
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         if navigationResponse.isForMainFrame,
            let response = navigationResponse.response as? HTTPURLResponse,
-           response.statusCode >= 400 {
+           response.statusCode >= 500 {
             fail("تعذر فتح الموقع (HTTP \(response.statusCode)). قد تكون هناك حماية وصول أو مشكلة في الخادم.")
             decisionHandler(.cancel)
             return

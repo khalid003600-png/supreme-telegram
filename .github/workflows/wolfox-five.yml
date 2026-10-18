@@ -1,0 +1,54 @@
+name: WolFox five independent APKs
+on:
+  push:
+    branches: [wolfox-five-build-20261018]
+    paths:
+      - ci/wolfox-source-objects.zip
+      - ci/unpack-wolfox.py
+      - ci/build-wolfox.sh
+      - .github/workflows/wolfox-five.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    name: WolFox variant ${{ matrix.variant }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android build tools
+        run: sdkmanager --install 'platforms;android-34' 'build-tools;34.0.0'
+      - name: Build and verify APK
+        id: build
+        env:
+          WOLFOX_KEYSTORE_BASE64: ${{ secrets.WOLFOX_KEYSTORE_BASE64 }}
+          WOLFOX_KEY_ALIAS: ${{ secrets.WOLFOX_KEY_ALIAS }}
+          WOLFOX_KEYSTORE_PASS: ${{ secrets.WOLFOX_KEYSTORE_PASS }}
+          WOLFOX_KEY_PASS: ${{ secrets.WOLFOX_KEY_PASS }}
+        run: bash ci/build-wolfox.sh '${{ matrix.variant }}'
+      - name: Upload APK and verification
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: WolFox-${{ matrix.variant }}-${{ steps.build.outputs.signing }}
+          path: output/${{ matrix.variant }}/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload failure log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: WolFox-${{ matrix.variant }}-failure-log
+          path: output/${{ matrix.variant }}/build.log
+          if-no-files-found: ignore
+          retention-days: 7

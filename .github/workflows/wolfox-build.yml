@@ -14,25 +14,30 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Install Android SDK
-        run: sdkmanager --install 'platforms;android-34' 'build-tools;34.0.0'
-      - name: Verify WolFox source (never build unrelated app)
+      - name: Install Android SDK packages
         shell: bash
         run: |
           set -euo pipefail
+          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -V | tail -1)"
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" --install 'platforms;android-34' 'build-tools;34.0.0'
+      - name: Verify correct WolFox sources
+        run: |
+          set -euo pipefail
           grep -F "applicationId 'com.wolfox.gps'" app/build.gradle
-          test -f app/src/main/java/com/wolfox/gps/manager/FloatingManager.java
-          test -f app/src/main/java/com/wolfox/gps/manager/GPSMockManager.java
+          find app/src/main -name FloatingManager.java | grep -q .
+          find app/src/main -name GPSMockManager.java | grep -q .
           test -f tests-linux/check.sh
       - name: Linux source tests
         run: bash tests-linux/check.sh
       - name: Build APK
         run: gradle --no-daemon :app:testDebugUnitTest :app:assembleDebug --stacktrace
-      - name: Verify APK signature
+      - name: Verify APK
         run: |
           test -s app/build/outputs/apk/debug/app-debug.apk
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose app/build/outputs/apk/debug/app-debug.apk

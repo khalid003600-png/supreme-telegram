@@ -1,7 +1,55 @@
+// =====================================================
+//  WolFox GPS Module — build.gradle (app)
+// =====================================================
+
 plugins { id 'com.android.application' }
+
 android {
-    namespace 'com.wolfox.noroot'
-    compileSdk 35
-    defaultConfig { applicationId 'com.wolfox.noroot'; minSdk 26; targetSdk 35; versionCode 1; versionName '0.1.0' }
-    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    namespace 'com.wolfox.gps'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 34
+        applicationId 'com.wolfox.gps'
+        versionCode 313
+        versionName "3.1.1"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packaging {
+        jniLibs.useLegacyPackaging = false
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            debuggable false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            debuggable true
+        }
+    }
+
+    testOptions {
+        unitTests.includeAndroidResources = true
+        unitTests.all {
+            systemProperty 'robolectric.dependency.repo.url', 'https://repo.maven.apache.org/maven2'
+            maxParallelForks = 1
+        }
+    }
+}
+
+dependencies {
+    // API references only: runtime implementation must be supplied by the authorized host framework.
+    compileOnly 'de.robv.android.xposed:api:82'
+    testImplementation 'de.robv.android.xposed:api:82'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
 }

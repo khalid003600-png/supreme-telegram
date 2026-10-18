@@ -1,0 +1,30 @@
+{
+  "variant": "ColorRoles",
+  "versionName": "3.1.1",
+  "versionCode": 313,
+  "unitTests": {
+    "tests": 92,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lintIssues": [
+    {
+      "id": "OldTargetApi",
+      "severity": "Warning"
+    },
+    {
+      "id": "HardwareIds",
+      "severity": "Warning"
+    },
+    {
+      "id": "SetJavaScriptEnabled",
+      "severity": "Warning"
+    }
+  ],
+  "apkSha256": "537d368176ed12f5edcfc30b3b404a94153a46a301d14fe2c39fc357d7722ced",
+  "apkBytes": 652571,
+  "signature": "test",
+  "signerSha256": "5281ca15ea2481cbcc707b75d3f38c45735d6e246354e6220cbfdcaa5f73cb49",
+  "renamedInternalClasses": 212
+}

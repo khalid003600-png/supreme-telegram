@@ -107,7 +107,45 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+    - name: Debug repo contents
+      run: |
+        echo "Working directory: $(pwd)"
+        ls -la
+        find . -maxdepth 3 -type f -name gradlew -print || true
+
+    - name: Ensure gradlew is executable if present
+      run: |
+        if [ -f ./gradlew ]; then
+          chmod +x ./gradlew
+        fi
+
+    - name: Generate Gradle wrapper if missing and commit
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        if [ ! -f ./gradlew ]; then
+          echo "Gradle wrapper not found — generating with system Gradle"
+          gradle wrapper --gradle-version 8.7
+          chmod +x gradlew
+
+          # Commit generated wrapper back to repository so future runs have it.
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gradlew gradle/wrapper || true
+          if git diff --staged --quiet; then
+            echo "No wrapper files to commit"
+          else
+            git commit -m "CI: add Gradle wrapper" || true
+            # Push back to the current branch using the provided GITHUB_TOKEN
+            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:${{ github.ref_name }} || true
+          fi
+        else
+          echo "Gradle wrapper already present"
+        fi
+
     # Generates and submits a dependency graph, enabling Dependabot Alerts for all project dependencies.
     # See: https://github.com/gradle/actions/blob/main/dependency-submission/README.md
     - name: Generate and submit dependency graph
       uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      with:
+        gradle-version: '8.7'

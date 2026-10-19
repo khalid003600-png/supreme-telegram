@@ -205,6 +205,9 @@ public final class FeatureIntegration {
         actionsLp.setMargins(0, WFDesign.dp(activity, 10), 0, WFDesign.dp(activity, 6));
         root.addView(actions, actionsLp);
 
+        Button selectDevice = WFDesign.button(activity, "اختيار جهاز من نتائج الفحص",
+                WFDesign.BUTTON_BLUETOOTH, WFDesign.TEXT);
+        root.addView(selectDevice, fullWrap());
         Button settings = WFDesign.button(activity, "إعدادات Bluetooth", WFDesign.BUTTON_SETTINGS,
                 WFDesign.TEXT);
         root.addView(settings, fullWrap());
@@ -218,6 +221,7 @@ public final class FeatureIntegration {
             status.setText("تم إيقاف المسح");
             renderBluetoothResults();
         });
+        selectDevice.setOnClickListener(view -> selectDiscoveredDevice(activity, status));
         settings.setOnClickListener(view -> openBluetoothSettings(activity));
         showDialog(activity, "Bluetooth والأجهزة القريبة", root, FeatureIntegration::stopScan);
     }
@@ -499,6 +503,26 @@ public final class FeatureIntegration {
             TextView status = bluetoothStatus.get();
             if (status != null) status.post(() -> status.setText("يلزم إذن اتصال Bluetooth لعرض أسماء الأجهزة"));
         }
+    }
+
+    private static void selectDiscoveredDevice(Activity activity, TextView status) {
+        final String[] devices;
+        synchronized (DISCOVERED_LOCK) {
+            devices = discovered.values().toArray(new String[0]);
+        }
+        if (devices.length == 0) {
+            status.setText("افحص الأجهزة أولًا ثم اختر جهازًا من النتائج");
+            return;
+        }
+        new AlertDialog.Builder(activity)
+                .setTitle("اختيار جهاز Bluetooth")
+                .setItems(devices, (dialog, index) -> {
+                    // Selection is local only; GATT connection requires an explicit service workflow.
+                    status.setText("الجهاز المختار: " + devices[index]
+                            + " — تم الاختيار، ولم يتم إنشاء اتصال");
+                })
+                .setNegativeButton("إلغاء", null)
+                .show();
     }
 
     private static void renderBluetoothResults() {

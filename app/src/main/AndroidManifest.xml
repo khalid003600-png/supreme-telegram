@@ -19,7 +19,7 @@
         android:usesCleartextTraffic="false"
         android:hasCode="true"
         android:icon="@drawable/wolfox_module_icon"
-        android:label="WolFox GPS 5"
+        android:label="WolFox GPS 3"
         android:supportsRtl="true"
         tools:targetApi="s"
         android:theme="@android:style/Theme.Material.NoActionBar">

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.StateListDrawable;
@@ -88,6 +89,10 @@ public final class WFDesign {
         button.setEllipsize(TextUtils.TruncateAt.END);
         button.setPadding(dp(context, 12), dp(context, 6), dp(context, 12), dp(context, 6));
         button.setBackgroundTintList(null);
+        LinearLayout.LayoutParams spacing = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        spacing.setMargins(dp(context, 3), dp(context, 5), dp(context, 3), dp(context, 5));
+        button.setLayoutParams(spacing);
         colorButton(button, label, background, foreground);
         button.setFocusable(true);
         WFTheme.apply(button, true);
@@ -148,7 +153,7 @@ public final class WFDesign {
     }
 
     public static void colorButton(Button button, String label, int fallback, int foreground) {
-        int background = referenceActionColor(label, fallback);
+        int background = semanticColor(label, fallback);
         int activeText = isSemanticLabel(label) || contrast(foreground, background) < 4.5d
                 ? readableTextColor(background) : foreground;
         button.setTextColor(new ColorStateList(new int[][] {
@@ -214,6 +219,20 @@ public final class WFDesign {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.setMargins(0, dp(root.getContext(), 12), 0, dp(root.getContext(), 4));
         root.addView(close, lp);
+        TextView credit = new TextView(root.getContext());
+        credit.setText("برمجة وتطوير خالد الزبيدي");
+        credit.setTextSize(13);
+        credit.setTypeface(Typeface.create("serif", Typeface.BOLD));
+        credit.setTextColor(0xFFFFD68A);
+        credit.setGravity(Gravity.CENTER);
+        credit.setPadding(dp(root.getContext(), 10), dp(root.getContext(), 10),
+                dp(root.getContext(), 10), dp(root.getContext(), 10));
+        credit.setBackground(rounded(0xFF27324B, 12, 0xFFDBA84E, 1));
+        credit.setTag("wolfox.developer.credit");
+        LinearLayout.LayoutParams creditLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        creditLp.setMargins(0, dp(root.getContext(), 8), 0, dp(root.getContext(), 6));
+        root.addView(credit, creditLp);
     }
 
     private static Button findClose(View view) {

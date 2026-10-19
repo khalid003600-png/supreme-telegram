@@ -37,7 +37,7 @@ import java.lang.reflect.Field;
 public class EmbeddedHostFloatingTest {
     private static final String CONTROL_TAG = "WFX_CONTROL_311";
     private static final String STORAGE_PREFS = "wolfox_gps_prefs";
-    private static final String CONTROL_PREFS = "wolfox_remote_control";
+    private static final String CONTROL_PREFS = "wolfox_remote_control_variant5";
     private static final String KEY_BUBBLE_VISIBLE = "bubble_visible";
 
     private Context appContext;

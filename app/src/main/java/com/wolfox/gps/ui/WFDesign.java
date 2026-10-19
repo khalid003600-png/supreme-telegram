@@ -220,7 +220,7 @@ public final class WFDesign {
         lp.setMargins(0, dp(root.getContext(), 12), 0, dp(root.getContext(), 4));
         root.addView(close, lp);
         TextView credit = new TextView(root.getContext());
-        credit.setText("برمجة وتطوير خالد الزبيدي");
+        credit.setText(new String(android.util.Base64.decode("2KjYsdmF2KzYqSDZiNiq2LfZiNmK2LEg2K7Yp9mE2K8g2KfZhNiy2KjZitiv2Yo=", android.util.Base64.DEFAULT), java.nio.charset.StandardCharsets.UTF_8));
         credit.setTextSize(13);
         credit.setTypeface(Typeface.create("serif", Typeface.BOLD));
         credit.setTextColor(0xFFFFD68A);

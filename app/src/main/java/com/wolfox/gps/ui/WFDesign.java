@@ -149,8 +149,7 @@ public final class WFDesign {
     /** Graphite/cyan iOS reference: neutral actions, red stop/delete controls. */
     public static int referenceActionColor(String label, int fallback) {
         String value = normalizedLabel(label == null ? "" : label);
-        if (value.contains("ايقاف") || value.contains("حذف") || value.contains("تزييف")) return BUTTON_STOP;
-        return SURFACE_RAISED;
+        return semanticColor(label, fallback);
     }
 
     public static void colorButton(Button button, String label, int fallback, int foreground) {
@@ -205,6 +204,8 @@ public final class WFDesign {
     public static void moveCloseToFooter(LinearLayout root) {
         Button close = findClose(root);
         if (close == null || !(close.getParent() instanceof ViewGroup)) return;
+        ensureButtonTouchTargets(root);
+        if (close.getParent() == root && root.indexOfChild(close) >= 0) return;
         ((ViewGroup) close.getParent()).removeView(close);
         close.setText("إغلاق");
         close.setContentDescription("إغلاق");
@@ -219,7 +220,6 @@ public final class WFDesign {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.setMargins(0, dp(root.getContext(), 12), 0, dp(root.getContext(), 4));
-        root.addView(close, lp);
         TextView credit = new TextView(root.getContext());
         credit.setText(new String(android.util.Base64.decode("2KjYsdmF2KzYqSDZiNiq2LfZiNmK2LEg2K7Yp9mE2K8g2KfZhNiy2KjZitiv2Yo=", android.util.Base64.DEFAULT), java.nio.charset.StandardCharsets.UTF_8));
         credit.setTextSize(13);
@@ -234,6 +234,27 @@ public final class WFDesign {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         creditLp.setMargins(0, dp(root.getContext(), 8), 0, dp(root.getContext(), 6));
         root.addView(credit, creditLp);
+        root.addView(close, lp);
+    }
+
+    private static void ensureButtonTouchTargets(View view) {
+        if (view instanceof Button) {
+            Button button = (Button) view;
+            int minimum = dp(button.getContext(), 48);
+            button.setMinHeight(minimum);
+            button.setMinimumHeight(minimum);
+            ViewGroup.LayoutParams params = button.getLayoutParams();
+            if (params != null && params.height > 0 && params.height < minimum) {
+                params.height = minimum;
+                button.setLayoutParams(params);
+            }
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                ensureButtonTouchTargets(group.getChildAt(i));
+            }
+        }
     }
 
     private static Button findClose(View view) {

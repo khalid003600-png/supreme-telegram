@@ -1,9 +1,5 @@
 pluginManagement {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
+    repositories { google(); mavenCentral(); gradlePluginPortal() }
 }
 rootProject.name = "WolFoxVariant5"
 include ':app'

@@ -1,0 +1,13 @@
+plugins { id 'com.android.application' version '8.6.1' }
+android {
+ namespace 'com.wolfox.model'
+ compileSdk 35
+ defaultConfig { applicationId 'com.wolfox.model'; minSdk 26; targetSdk 35; versionCode 1; versionName '1.0.0' }
+ flavorDimensions 'model'
+ productFlavors {
+  gpsOnly { dimension 'model'; applicationIdSuffix '.gps'; resValue 'string', 'app_name', 'WolFox GPS' }
+  gpsBluetooth { dimension 'model'; applicationIdSuffix '.bluetooth'; resValue 'string', 'app_name', 'WolFox GPS Bluetooth' }
+  gpsCamera { dimension 'model'; applicationIdSuffix '.camera'; resValue 'string', 'app_name', 'WolFox GPS Camera' }
+ }
+ compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}

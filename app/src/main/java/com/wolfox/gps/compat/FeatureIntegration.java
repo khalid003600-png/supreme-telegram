@@ -268,13 +268,26 @@ public final class FeatureIntegration {
     public static void refresh() { }
 
     private static void launchImagePicker(Activity activity) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         try {
-            activity.startActivityForResult(Intent.createChooser(intent, "اختيار صورة"),
-                    IMAGE_PICK_REQUEST);
+            activity.startActivityForResult(intent, IMAGE_PICK_REQUEST);
         } catch (Exception error) {
-            Toast.makeText(activity, "تعذر فتح منتقي الصور", Toast.LENGTH_SHORT).show();
+            // Some embedded hosts do not expose the document picker.
+            Intent fallback = new Intent(Intent.ACTION_GET_CONTENT);
+            fallback.setType("image/*");
+            fallback.addCategory(Intent.CATEGORY_OPENABLE);
+            fallback.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            try {
+                activity.startActivityForResult(fallback, IMAGE_PICK_REQUEST);
+            } catch (Exception fallbackError) {
+                TextView status = cameraStatus.get();
+                if (status != null) status.setText("تعذر فتح الاستديو في التطبيق الحالي");
+                Toast.makeText(activity, "تعذر فتح منتقي الصور", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -299,7 +312,28 @@ public final class FeatureIntegration {
             return;
         }
         if (requestCode == IMAGE_PICK_REQUEST) {
-            selectedImage = data.getData();
+            Uri uri = data.getData();
+            if (uri == null && data.getClipData() != null
+                    && data.getClipData().getItemCount() > 0) {
+                uri = data.getClipData().getItemAt(0).getUri();
+            }
+            if (uri == null) {
+                TextView status = cameraStatus.get();
+                if (status != null) status.setText("لم يُرجع الاستديو صورة صالحة");
+                return;
+            }
+            try {
+                if ((data.getFlags() & Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION) != 0) {
+                    ImageView currentPreview = cameraPreview.get();
+                    if (currentPreview != null) {
+                        currentPreview.getContext().getContentResolver()
+                                .takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    }
+                }
+            } catch (SecurityException ignored) {
+                // A temporary read grant is sufficient for the current preview.
+            }
+            selectedImage = uri;
             capturedThumbnail = null;
         } else if (requestCode == CAMERA_CAPTURE_REQUEST) {
             selectedImage = data.getData();

@@ -1,0 +1,12 @@
+{
+  "variant": 5,
+  "application_id": "com.wolfox.gps.variant5",
+  "reference_apk_version": 5,
+  "features": [
+    "GPS",
+    "BLE"
+  ],
+  "runtime_verified": false,
+  "full_apk_build_verified": true,
+  "binary_equivalent_to_original": false
+}

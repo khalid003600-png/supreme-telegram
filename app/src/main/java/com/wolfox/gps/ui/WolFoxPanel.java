@@ -197,6 +197,7 @@ public final class WolFoxPanel {
                     SettingsDialog.show(activity);
                 })));
 
+        root.addView(action(activity, "إشارات البلوتوث BLE", view -> com.wolfox.gps.compat.FeatureIntegration.show(activity)));
         Button hideBubble = action(activity, WFTheme.icon("○") + "  إخفاء الأيقونة",
                 v -> FloatingManager.getInstance().requestHideConfirmation(activity));
         LinearLayout.LayoutParams hideBubbleLp = fullWrap();

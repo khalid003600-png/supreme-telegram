@@ -15,6 +15,6 @@ public final class WFHostPolicy {
         if ("android".equals(packageName) || packageName.startsWith("android.")) return false;
         if ("com.android.systemui".equals(packageName)
                 || packageName.startsWith("com.android.systemui.")) return false;
-        return !"com.wolfox.gps".equals(packageName);
+        return !"com.wolfox.gps".equals(packageName) && !packageName.matches("com\\.wolfox\\.gps\\.variant[1-5]");
     }
 }

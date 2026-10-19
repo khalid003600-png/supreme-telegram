@@ -10,7 +10,7 @@ version_name="${WOLFOX_VERSION_NAME:-3.1.1}"
 version_code="${WOLFOX_VERSION_CODE:-313}"
 ecj_jar="${ECJ_JAR:-$project_dir/../toolchain/downloads/ecj-3.38.0.jar}"
 unsigned_only="${WOLFOX_UNSIGNED_ONLY:-0}"
-xposed_api_jar="${XPOSED_API_JAR:-}"
+xposed_api_jar="${XPOSED_API_JAR:-$project_dir/app/libs/xposed-api-82.jar}"
 
 fail() {
   printf 'Build preflight failed: %s\n' "$*" >&2
@@ -138,7 +138,7 @@ android = 'http://schemas.android.com/apk/res/android'
 ET.register_namespace('android', android)
 ET.register_namespace('tools', 'http://schemas.android.com/tools')
 tree = ET.parse(sys.argv[1])
-tree.getroot().set('package', 'com.wolfox.gps')
+tree.getroot().set('package', 'com.wolfox.gps.variant5')
 application = tree.getroot().find('application')
 application.set('{' + android + '}debuggable', 'false')
 application.set('{' + android + '}extractNativeLibs', 'false')

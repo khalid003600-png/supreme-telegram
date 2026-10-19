@@ -1,0 +1,31 @@
+{
+  "variant": 5,
+  "application_id": "com.wolfox.gps.variant5",
+  "version_name": "3.1.1",
+  "version_code": 313,
+  "java_compilation": "passed",
+  "compiler": "javac 17.0.20.1 targeting Java 8 bytecode",
+  "android_platform": 34,
+  "build_tools": "34.0.0",
+  "build_method": "build-local.sh with WOLFOX_UNSIGNED_ONLY=1",
+  "unsigned_apk_build": "passed",
+  "apk_file": "WolFox_GPS_Module_v3.1.1_UNSIGNED_ALIGNED.apk",
+  "apk_size_bytes": 645276,
+  "apk_sha256": "2418b4c466e9770adfe0edf36bb0d17cf273410efd1239a4ab10e12e8100ff41",
+  "apk_zip_crc": "passed",
+  "zip_alignment": "passed",
+  "apk_package_id_check": "passed",
+  "apk_signature": "unsigned; apksigner reports DOES NOT VERIFY as expected and no certificate entries are present",
+  "apk_debuggable": false,
+  "xposed_runtime_classes_excluded": true,
+  "class_definitions_after_r8": 226,
+  "source_checks": "9 selected static source checks passed",
+  "warnings": [
+    "Java compiler noted use of deprecated APIs; compilation succeeded."
+  ],
+  "gradle_build_run": false,
+  "device_runtime_tested": false,
+  "license_server_tested": false,
+  "binary_equivalence_to_k7_apk": false,
+  "host_self_exclusion_regression": "passed"
+}

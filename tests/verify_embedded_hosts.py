@@ -18,7 +18,7 @@ assert 'com.t2.AvailoHader' not in hook
 assert 'WFHostPolicy.permits(lpparam.packageName)' in hook
 assert 'com.android.systemui' in policy and 'com.wolfox.gps' in policy and 'android.' in policy
 assert metadata['scope'] == []
-assert metadata['id'] == 'com.wolfox.gps' and metadata['versionCode'] == 313
+assert metadata['id'] == 'com.wolfox.gps.variant5' and metadata['versionCode'] == 313
 for api in ('attach', 'showControls', 'hideControls'):
     assert f'public static void {api}(Activity activity)' in bridge
 assert 'public static void observeTouch(Activity activity, MotionEvent event)' in bridge

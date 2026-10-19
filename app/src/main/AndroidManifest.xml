@@ -6,6 +6,11 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
     <application
         android:allowBackup="false"
         android:fullBackupContent="false"
@@ -13,7 +18,7 @@
         android:usesCleartextTraffic="false"
         android:hasCode="true"
         android:icon="@drawable/wolfox_module_icon"
-        android:label="WolFox GPS Module"
+        android:label="WolFox GPS 5"
         android:supportsRtl="true"
         tools:targetApi="s"
         android:theme="@android:style/Theme.Material.NoActionBar">

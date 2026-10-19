@@ -1,0 +1,542 @@
+xposed_api_mode=official-api-jar
+----------
+1. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/compat/FeatureIntegration.java (at line 6)
+	import android.view.*;
+	       ^^^^^^^^^^^^
+The import android.view is never used
+----------
+----------
+2. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/hook/WolFoxHook.java (at line 75)
+	return location.isFromMockProvider();
+	                ^^^^^^^^^^^^^^^^^^^^
+The method isFromMockProvider() from the type Location is deprecated
+----------
+----------
+3. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/ActivationDialog.java (at line 82)
+	w.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+	                                                           ^^^^^^^^^^^^^^^^^^^^^^^^
+The field WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE is deprecated
+----------
+----------
+4. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/FavoritesDialog.java (at line 6)
+	import android.graphics.drawable.GradientDrawable;
+	       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The import android.graphics.drawable.GradientDrawable is never used
+----------
+5. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/FavoritesDialog.java (at line 47)
+	android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+	                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+The field WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE is deprecated
+----------
+----------
+6. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/MapDialog.java (at line 388)
+	private static void copySelectedCoordinates(String value, Activity activity, String label) {
+	                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The method copySelectedCoordinates(String, Activity, String) from the type MapDialog is never used locally
+----------
+----------
+7. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/SettingsDialog.java (at line 41)
+	w.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+	                                                           ^^^^^^^^^^^^^^^^^^^^^^^^
+The field WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE is deprecated
+----------
+----------
+8. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/SubscriptionDialog.java (at line 43)
+	window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+	                                                                ^^^^^^^^^^^^^^^^^^^^^^^^
+The field WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE is deprecated
+----------
+----------
+9. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/WFLocationActions.java (at line 21)
+	import java.util.Locale;
+	       ^^^^^^^^^^^^^^^^
+The import java.util.Locale is never used
+----------
+10. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/WFLocationActions.java (at line 86)
+	android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+	                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+The field WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE is deprecated
+----------
+----------
+11. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/WolFoxPanel.java (at line 4)
+	import android.app.AlertDialog;
+	       ^^^^^^^^^^^^^^^^^^^^^^^
+The import android.app.AlertDialog is never used
+----------
+12. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/WolFoxPanel.java (at line 6)
+	import android.content.ClipData;
+	       ^^^^^^^^^^^^^^^^^^^^^^^^
+The import android.content.ClipData is never used
+----------
+13. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/WolFoxPanel.java (at line 7)
+	import android.content.ClipboardManager;
+	       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The import android.content.ClipboardManager is never used
+----------
+14. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/WolFoxPanel.java (at line 17)
+	import android.widget.EditText;
+	       ^^^^^^^^^^^^^^^^^^^^^^^
+The import android.widget.EditText is never used
+----------
+15. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/WolFoxPanel.java (at line 28)
+	import com.wolfox.gps.model.FavoriteLocation;
+	       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The import com.wolfox.gps.model.FavoriteLocation is never used
+----------
+16. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/ui/WolFoxPanel.java (at line 362)
+	private static LinearLayout.LayoutParams full(int height) {
+	                                         ^^^^^^^^^^^^^^^^
+The method full(int) from the type WolFoxPanel is never used locally
+----------
+----------
+17. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/com/wolfox/gps/util/WFTheme.java (at line 86)
+	float scaledDensity = view.getResources().getDisplayMetrics().scaledDensity;
+	                                                              ^^^^^^^^^^^^^
+The field DisplayMetrics.scaledDensity is deprecated
+----------
+----------
+18. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 56)
+	private static final int MAX_IMPORT_BYTES = 8388608;
+	                         ^^^^^^^^^^^^^^^^
+The value of the field K7Bluetooth.MAX_IMPORT_BYTES is not used
+----------
+19. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 67)
+	private static volatile Activity activity;
+	                                 ^^^^^^^^
+The value of the field K7Bluetooth.activity is not used
+----------
+20. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 81)
+	private static final Map<String, Long> LAST_STORED = new HashMap();
+	                                                     ^^^^^^^^^^^^^
+Type safety: The expression of type HashMap needs unchecked conversion to conform to Map<String,Long>
+----------
+21. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 81)
+	private static final Map<String, Long> LAST_STORED = new HashMap();
+	                                                         ^^^^^^^
+HashMap is a raw type. References to generic type HashMap<K,V> should be parameterized
+----------
+22. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 82)
+	private static final Map<ScanCallback, ModernWrapper> MODERN_WRAPPERS = Collections.synchronizedMap(new IdentityHashMap());
+	                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: Unchecked invocation synchronizedMap(IdentityHashMap) of the generic method synchronizedMap(Map<K,V>) of type Collections
+----------
+23. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 82)
+	private static final Map<ScanCallback, ModernWrapper> MODERN_WRAPPERS = Collections.synchronizedMap(new IdentityHashMap());
+	                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The expression of type Map needs unchecked conversion to conform to Map<ScanCallback,K7Bluetooth.ModernWrapper>
+----------
+24. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 82)
+	private static final Map<ScanCallback, ModernWrapper> MODERN_WRAPPERS = Collections.synchronizedMap(new IdentityHashMap());
+	                                                                                                    ^^^^^^^^^^^^^^^^^^^^^
+Type safety: The expression of type IdentityHashMap needs unchecked conversion to conform to Map<Object,Object>
+----------
+25. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 82)
+	private static final Map<ScanCallback, ModernWrapper> MODERN_WRAPPERS = Collections.synchronizedMap(new IdentityHashMap());
+	                                                                                                        ^^^^^^^^^^^^^^^
+IdentityHashMap is a raw type. References to generic type IdentityHashMap<K,V> should be parameterized
+----------
+26. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 83)
+	private static final Set<ScanCallback> ACTIVE_MODERN = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap()));
+	                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: Unchecked invocation synchronizedSet(Set) of the generic method synchronizedSet(Set<T>) of type Collections
+----------
+27. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 83)
+	private static final Set<ScanCallback> ACTIVE_MODERN = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap()));
+	                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The expression of type Set needs unchecked conversion to conform to Set<ScanCallback>
+----------
+28. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 83)
+	private static final Set<ScanCallback> ACTIVE_MODERN = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap()));
+	                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: Unchecked invocation newSetFromMap(IdentityHashMap) of the generic method newSetFromMap(Map<E,Boolean>) of type Collections
+----------
+29. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 83)
+	private static final Set<ScanCallback> ACTIVE_MODERN = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap()));
+	                                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The expression of type Set needs unchecked conversion to conform to Set<ScanCallback>
+----------
+30. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 83)
+	private static final Set<ScanCallback> ACTIVE_MODERN = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap()));
+	                                                                                                             ^^^^^^^^^^^^^^^^^^^^^
+Type safety: The expression of type IdentityHashMap needs unchecked conversion to conform to Map<Object,Boolean>
+----------
+31. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 83)
+	private static final Set<ScanCallback> ACTIVE_MODERN = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap()));
+	                                                                                                                 ^^^^^^^^^^^^^^^
+IdentityHashMap is a raw type. References to generic type IdentityHashMap<K,V> should be parameterized
+----------
+32. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 84)
+	private static final Map<BluetoothAdapter.LeScanCallback, BluetoothAdapter.LeScanCallback> LEGACY_WRAPPERS = Collections.synchronizedMap(new IdentityHashMap());
+	                                                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: Unchecked invocation synchronizedMap(IdentityHashMap) of the generic method synchronizedMap(Map<K,V>) of type Collections
+----------
+33. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 84)
+	private static final Map<BluetoothAdapter.LeScanCallback, BluetoothAdapter.LeScanCallback> LEGACY_WRAPPERS = Collections.synchronizedMap(new IdentityHashMap());
+	                                                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The expression of type Map needs unchecked conversion to conform to Map<BluetoothAdapter.LeScanCallback,BluetoothAdapter.LeScanCallback>
+----------
+34. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 84)
+	private static final Map<BluetoothAdapter.LeScanCallback, BluetoothAdapter.LeScanCallback> LEGACY_WRAPPERS = Collections.synchronizedMap(new IdentityHashMap());
+	                                                                                                                                         ^^^^^^^^^^^^^^^^^^^^^
+Type safety: The expression of type IdentityHashMap needs unchecked conversion to conform to Map<Object,Object>
+----------
+35. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 84)
+	private static final Map<BluetoothAdapter.LeScanCallback, BluetoothAdapter.LeScanCallback> LEGACY_WRAPPERS = Collections.synchronizedMap(new IdentityHashMap());
+	                                                                                                                                             ^^^^^^^^^^^^^^^
+IdentityHashMap is a raw type. References to generic type IdentityHashMap<K,V> should be parameterized
+----------
+36. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 85)
+	private static final Set<BluetoothAdapter.LeScanCallback> ACTIVE_LEGACY = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap()));
+	                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: Unchecked invocation synchronizedSet(Set) of the generic method synchronizedSet(Set<T>) of type Collections
+----------
+37. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 85)
+	private static final Set<BluetoothAdapter.LeScanCallback> ACTIVE_LEGACY = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap()));
+	                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The expression of type Set needs unchecked conversion to conform to Set<BluetoothAdapter.LeScanCallback>
+----------
+38. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 85)
+	private static final Set<BluetoothAdapter.LeScanCallback> ACTIVE_LEGACY = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap()));
+	                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: Unchecked invocation newSetFromMap(IdentityHashMap) of the generic method newSetFromMap(Map<E,Boolean>) of type Collections
+----------
+39. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 85)
+	private static final Set<BluetoothAdapter.LeScanCallback> ACTIVE_LEGACY = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap()));
+	                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The expression of type Set needs unchecked conversion to conform to Set<BluetoothAdapter.LeScanCallback>
+----------
+40. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 85)
+	private static final Set<BluetoothAdapter.LeScanCallback> ACTIVE_LEGACY = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap()));
+	                                                                                                                                ^^^^^^^^^^^^^^^^^^^^^
+Type safety: The expression of type IdentityHashMap needs unchecked conversion to conform to Map<Object,Boolean>
+----------
+41. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 85)
+	private static final Set<BluetoothAdapter.LeScanCallback> ACTIVE_LEGACY = Collections.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap()));
+	                                                                                                                                    ^^^^^^^^^^^^^^^
+IdentityHashMap is a raw type. References to generic type IdentityHashMap<K,V> should be parameterized
+----------
+42. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 86)
+	private static final Set<PendingIntent> ACTIVE_PENDING = Collections.synchronizedSet(new HashSet());
+	                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: Unchecked invocation synchronizedSet(HashSet) of the generic method synchronizedSet(Set<T>) of type Collections
+----------
+43. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 86)
+	private static final Set<PendingIntent> ACTIVE_PENDING = Collections.synchronizedSet(new HashSet());
+	                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The expression of type Set needs unchecked conversion to conform to Set<PendingIntent>
+----------
+44. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 86)
+	private static final Set<PendingIntent> ACTIVE_PENDING = Collections.synchronizedSet(new HashSet());
+	                                                                                     ^^^^^^^^^^^^^
+Type safety: The expression of type HashSet needs unchecked conversion to conform to Set<Object>
+----------
+45. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 86)
+	private static final Set<PendingIntent> ACTIVE_PENDING = Collections.synchronizedSet(new HashSet());
+	                                                                                         ^^^^^^^
+HashSet is a raw type. References to generic type HashSet<E> should be parameterized
+----------
+46. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 92)
+	boolean unused = K7Bluetooth.replayScheduled = false;
+	        ^^^^^^
+The value of the local variable unused is not used
+----------
+47. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 97)
+	boolean unused2 = K7Bluetooth.replayScheduled = true;
+	        ^^^^^^^
+The value of the local variable unused2 is not used
+----------
+48. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 300)
+	List list = (List) obj;
+	^^^^
+List is a raw type. References to generic type List<E> should be parameterized
+----------
+49. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 300)
+	List list = (List) obj;
+	             ^^^^
+List is a raw type. References to generic type List<E> should be parameterized
+----------
+50. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 409)
+	boolean unused = K7Bluetooth.ownScanning = false;
+	        ^^^^^^
+The value of the local variable unused is not used
+----------
+51. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 410)
+	BluetoothLeScanner unused2 = K7Bluetooth.ownScanner = null;
+	                   ^^^^^^^
+The value of the local variable unused2 is not used
+----------
+52. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 411)
+	ScanCallback unused3 = K7Bluetooth.ownCallback = null;
+	             ^^^^^^^
+The value of the local variable unused3 is not used
+----------
+53. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 506)
+	ArrayList arrayList = new ArrayList();
+	^^^^^^^^^
+ArrayList is a raw type. References to generic type ArrayList<E> should be parameterized
+----------
+54. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 506)
+	ArrayList arrayList = new ArrayList();
+	                          ^^^^^^^^^
+ArrayList is a raw type. References to generic type ArrayList<E> should be parameterized
+----------
+55. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 508)
+	arrayList.add("android.permission.BLUETOOTH_SCAN");
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+56. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 511)
+	arrayList.add("android.permission.BLUETOOTH_CONNECT");
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+57. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 514)
+	arrayList.add("android.permission.ACCESS_FINE_LOCATION");
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+58. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 517)
+	activity2.requestPermissions((String[]) arrayList.toArray(new String[arrayList.size()]), PERMISSION_REQUEST);
+	                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method toArray(Object[]) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+59. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 705)
+	ArrayList arrayList = new ArrayList();
+	^^^^^^^^^
+ArrayList is a raw type. References to generic type ArrayList<E> should be parameterized
+----------
+60. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 705)
+	ArrayList arrayList = new ArrayList();
+	                          ^^^^^^^^^
+ArrayList is a raw type. References to generic type ArrayList<E> should be parameterized
+----------
+61. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 710)
+	arrayList.add(new Signal(jSONObjectOptJSONObject));
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+62. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 713)
+	Collections.sort(arrayList, new Comparator<Signal>() { // from class: k7.gps.K7Bluetooth.7
+            @Override // java.util.Comparator
+            public int compare(Signal signal, Signal signal2) {
+                int i2 = 2;
+                int i3 = signal.connected ? 3 : signal.confirmed ? 2 : signal.live ? 1 : 0;
+                if (signal2.connected) {
+                    i2 = 3;
+                } else if (!signal2.confirmed) {
+                    i2 = signal2.live ? 1 : 0;
+                }
+                if (i3 != i2) {
+                    return i2 - i3;
+                }
+                if (signal.timestamp == signal2.timestamp) {
+                    return 0;
+                }
+                return signal.timestamp > signal2.timestamp ? -1 : 1;
+            }
+        });
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: Unchecked invocation sort(ArrayList, new Comparator<K7Bluetooth.Signal>(){}) of the generic method sort(List<T>, Comparator<? super T>) of type Collections
+----------
+63. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 713)
+	Collections.sort(arrayList, new Comparator<Signal>() { // from class: k7.gps.K7Bluetooth.7
+	                 ^^^^^^^^^
+Type safety: The expression of type ArrayList needs unchecked conversion to conform to List<K7Bluetooth.Signal>
+----------
+64. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 732)
+	return arrayList;
+	       ^^^^^^^^^
+Type safety: The expression of type ArrayList needs unchecked conversion to conform to List<K7Bluetooth.Signal>
+----------
+65. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 978)
+	HashSet hashSet = new HashSet();
+	^^^^^^^
+HashSet is a raw type. References to generic type HashSet<E> should be parameterized
+----------
+66. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 978)
+	HashSet hashSet = new HashSet();
+	                      ^^^^^^^
+HashSet is a raw type. References to generic type HashSet<E> should be parameterized
+----------
+67. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 985)
+	hashSet.add(strOptString);
+	^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type HashSet. References to generic type HashSet<E> should be parameterized
+----------
+68. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 996)
+	hashSet.add(strOptString2);
+	^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type HashSet. References to generic type HashSet<E> should be parameterized
+----------
+69. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1045)
+	BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+	                                            ^^^^^^^^^^^^^^^^^^^
+The method getDefaultAdapter() from the type BluetoothAdapter is deprecated
+----------
+70. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1050)
+	return new ScanResult(device, (ScanRecord) parser.invoke(null, bArr), i, SystemClock.elapsedRealtimeNanos());
+	           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The constructor ScanResult(BluetoothDevice, ScanRecord, int, long) is deprecated
+----------
+71. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1160)
+	BluetoothAdapter defaultAdapter = BluetoothAdapter.getDefaultAdapter();
+	                                                   ^^^^^^^^^^^^^^^^^^^
+The method getDefaultAdapter() from the type BluetoothAdapter is deprecated
+----------
+72. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1236)
+	return new ScanResult(scanResult.getDevice(), scanResult.getScanRecord(), scanResult.getRssi(), SystemClock.elapsedRealtimeNanos());
+	           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The constructor ScanResult(BluetoothDevice, ScanRecord, int, long) is deprecated
+----------
+73. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1399)
+	ArrayList arrayList = new ArrayList();
+	^^^^^^^^^
+ArrayList is a raw type. References to generic type ArrayList<E> should be parameterized
+----------
+74. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1399)
+	ArrayList arrayList = new ArrayList();
+	                          ^^^^^^^^^
+ArrayList is a raw type. References to generic type ArrayList<E> should be parameterized
+----------
+75. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1405)
+	arrayList.add(strShortUuid);
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+76. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1415)
+	arrayList.add(str);
+	^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+77. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1421)
+	arrayList.add("M:" + iOptInt);
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+78. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1425)
+	arrayList.add(strOptString);
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+79. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1435)
+	ArrayList arrayList = new ArrayList();
+	^^^^^^^^^
+ArrayList is a raw type. References to generic type ArrayList<E> should be parameterized
+----------
+80. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1435)
+	ArrayList arrayList = new ArrayList();
+	                          ^^^^^^^^^
+ArrayList is a raw type. References to generic type ArrayList<E> should be parameterized
+----------
+81. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1440)
+	arrayList.add(shortUuid(it.next().toString()));
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+82. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1449)
+	arrayList.add(str);
+	^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+83. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Bluetooth.java (at line 1456)
+	arrayList.add("M:" + manufacturerSpecificData.keyAt(i));
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+----------
+84. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7License.java (at line 56)
+	private static final String HOST = "k7eelan55.pw";
+	                            ^^^^
+The value of the field K7License.HOST is not used
+----------
+85. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7License.java (at line 839)
+	TreeSet treeSet = new TreeSet();
+	^^^^^^^
+TreeSet is a raw type. References to generic type TreeSet<E> should be parameterized
+----------
+86. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7License.java (at line 839)
+	TreeSet treeSet = new TreeSet();
+	                      ^^^^^^^
+TreeSet is a raw type. References to generic type TreeSet<E> should be parameterized
+----------
+87. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7License.java (at line 856)
+	treeSet.add(string2);
+	^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type TreeSet. References to generic type TreeSet<E> should be parameterized
+----------
+88. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7License.java (at line 951)
+	HashSet hashSet = new HashSet();
+	^^^^^^^
+HashSet is a raw type. References to generic type HashSet<E> should be parameterized
+----------
+89. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7License.java (at line 951)
+	HashSet hashSet = new HashSet();
+	                      ^^^^^^^
+HashSet is a raw type. References to generic type HashSet<E> should be parameterized
+----------
+90. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7License.java (at line 954)
+	hashSet.add(itKeys.next());
+	^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type HashSet. References to generic type HashSet<E> should be parameterized
+----------
+91. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7License.java (at line 956)
+	HashSet hashSet2 = new HashSet(Arrays.asList(strArr));
+	^^^^^^^
+HashSet is a raw type. References to generic type HashSet<E> should be parameterized
+----------
+92. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7License.java (at line 956)
+	HashSet hashSet2 = new HashSet(Arrays.asList(strArr));
+	                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The constructor HashSet(Collection) belongs to the raw type HashSet. References to generic type HashSet<E> should be parameterized
+----------
+93. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7License.java (at line 956)
+	HashSet hashSet2 = new HashSet(Arrays.asList(strArr));
+	                       ^^^^^^^
+HashSet is a raw type. References to generic type HashSet<E> should be parameterized
+----------
+94. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7License.java (at line 957)
+	return hashSet.size() == hashSet2.size() && hashSet.containsAll(hashSet2);
+	                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method containsAll(Collection) belongs to the raw type AbstractCollection. References to generic type AbstractCollection<E> should be parameterized
+----------
+95. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7License.java (at line 1014)
+	private static String b64urlStd(byte[] bArr) {
+	                      ^^^^^^^^^^^^^^^^^^^^^^
+The method b64urlStd(byte[]) from the type K7License is never used locally
+----------
+----------
+96. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Pump.java (at line 168)
+	ArrayList arrayList = new ArrayList();
+	^^^^^^^^^
+ArrayList is a raw type. References to generic type ArrayList<E> should be parameterized
+----------
+97. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Pump.java (at line 168)
+	ArrayList arrayList = new ArrayList();
+	                          ^^^^^^^^^
+ArrayList is a raw type. References to generic type ArrayList<E> should be parameterized
+----------
+98. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/K7Pump.java (at line 169)
+	arrayList.add(location);
+	^^^^^^^^^^^^^^^^^^^^^^^
+Type safety: The method add(Object) belongs to the raw type ArrayList. References to generic type ArrayList<E> should be parameterized
+----------
+----------
+99. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/KxG.java (at line 110)
+	if (packageInfo.signatures != null && packageInfo.signatures.length > 0) {
+	                ^^^^^^^^^^
+The field PackageInfo.signatures is deprecated
+----------
+100. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/KxG.java (at line 110)
+	if (packageInfo.signatures != null && packageInfo.signatures.length > 0) {
+	                                                  ^^^^^^^^^^
+The field PackageInfo.signatures is deprecated
+----------
+101. WARNING in /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/app/src/main/java/k7/gps/KxG.java (at line 111)
+	byteArray = packageInfo.signatures[0].toByteArray();
+	                        ^^^^^^^^^^
+The field PackageInfo.signatures is deprecated
+----------
+101 problems (101 warnings)
+build_mode=unsigned
+apk=/workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/build/local/apk/WolFox_GPS_Module_v3.1.1_UNSIGNED_ALIGNED.apk
+feacb30ba5688ecb2aab70562960462108eae0e326873dd74aa210fed1237bf8  /workspace/scratch/4270afe9a3ff/corrected-projects/WolFox-Source-5/build/local/apk/WolFox_GPS_Module_v3.1.1_UNSIGNED_ALIGNED.apk

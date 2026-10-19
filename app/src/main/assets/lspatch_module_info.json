@@ -1,6 +1,6 @@
 {
-  "id": "com.wolfox.gps",
-  "name": "WolFox GPS Module",
+  "id": "com.wolfox.gps.variant5",
+  "name": "WolFox GPS 5",
   "version": "3.1.1",
   "versionCode": 313,
   "description": "WolFox GPS licensed module for explicitly embedded application hosts",

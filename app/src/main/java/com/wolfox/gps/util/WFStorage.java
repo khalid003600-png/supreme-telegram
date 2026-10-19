@@ -25,7 +25,7 @@ import java.util.UUID;
  */
 public class WFStorage {
 
-    private static final String PREF_NAME          = "wolfox_gps_prefs";
+    private static final String PREF_NAME          = "wolfox_gps_prefs_variant5";
     private static final String KEY_FAVORITES      = "favorites";
     private static final String KEY_HISTORY        = "history";
     private static final String KEY_LAST_LAT       = "last_lat";

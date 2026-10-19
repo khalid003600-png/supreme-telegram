@@ -48,6 +48,8 @@ public class GPSMockManager {
 
     public synchronized void init(Context ctx) {
         if (ctx != null) {
+            try { com.wolfox.gps.compat.FeatureIntegration.init(ctx); }
+            catch (Throwable failure) { android.util.Log.w("WolFox.Compat", "Feature initialization failed", failure); }
             Context candidate = ctx.getApplicationContext();
             this.appContext = candidate != null ? candidate : ctx;
             // استعادة الحالة من آخر جلسة
@@ -230,14 +232,9 @@ public class GPSMockManager {
             for (String provider : manager.getProviders(true)) {
                 try {
                     Location value = manager.getLastKnownLocation(provider);
-                    if (value != null && Double.isFinite(value.getLatitude())
-                            && Double.isFinite(value.getLongitude())
-                            && value.getLatitude() >= -90d && value.getLatitude() <= 90d
-                            && value.getLongitude() >= -180d && value.getLongitude() <= 180d
-                            && (best == null || value.getTime() > best.getTime()
-                            || (value.getTime() == best.getTime() && value.hasAccuracy()
-                            && (!best.hasAccuracy() || value.getAccuracy() < best.getAccuracy()))))
-                        best = value;
+                    if (value != null && (best == null
+                            || value.getTime() > best.getTime()
+                            || value.getAccuracy() < best.getAccuracy())) best = value;
                 } catch (SecurityException ignored) {}
             }
             if (best == null) return null;
@@ -276,11 +273,7 @@ public class GPSMockManager {
     }
 
     public Location buildLocation(String provider, WFLocation wfLoc) {
-        if (wfLoc == null || !wfLoc.isValid()) {
-            throw new IllegalArgumentException("Valid location required");
-        }
-        Location loc = new Location(provider != null && !provider.isEmpty()
-                ? provider : LocationManager.GPS_PROVIDER);
+        Location loc = new Location(provider != null ? provider : LocationManager.GPS_PROVIDER);
         loc.setLatitude(wfLoc.getLatitude());
         loc.setLongitude(wfLoc.getLongitude());
         loc.setAltitude(wfLoc.getAltitude());

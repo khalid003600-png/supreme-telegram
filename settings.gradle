@@ -5,5 +5,5 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = "WolFoxGPSModule"
+rootProject.name = "WolFoxVariant5"
 include ':app'

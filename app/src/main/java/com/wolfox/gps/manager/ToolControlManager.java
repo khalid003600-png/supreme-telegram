@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 /** Cached server policy for maintenance, disablement and mandatory updates. */
 public final class ToolControlManager {
     private static final String TAG = "ToolControl";
-    private static final String PREFS = "wolfox_remote_control";
+    private static final String PREFS = "wolfox_remote_control_variant5";
     private static final long ATTEMPT_GUARD_MS = 5000L;
     private static final long CHECK_INTERVAL_MS = 45000L;
     private static final long MONITOR_INTERVAL_MS = 60000L;

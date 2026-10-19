@@ -11,8 +11,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
-import android.view.WindowInsets;
-import android.graphics.Insets;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -326,9 +324,10 @@ public final class FloatingManager {
                 if (token != attachToken || attachedButton == null || attachedParent == null
                         || floatingButton() != attachedButton
                         || attachedButton.getParent() != attachedParent) return;
-                float[] bounds = safeBounds(attachedParent, attachedButton);
-                attachedButton.setX(bounds[0] + (bounds[2] - bounds[0]) * storage.getBubbleXFraction());
-                attachedButton.setY(bounds[1] + (bounds[3] - bounds[1]) * storage.getBubbleYFraction());
+                int maxX = Math.max(0, attachedParent.getWidth() - attachedButton.getWidth());
+                int maxY = Math.max(0, attachedParent.getHeight() - attachedButton.getHeight());
+                attachedButton.setX(maxX * storage.getBubbleXFraction());
+                attachedButton.setY(maxY * storage.getBubbleYFraction());
                 attachedButton.setScaleX(0.72f);
                 attachedButton.setScaleY(0.72f);
                 attachedButton.animate().scaleX(1f).scaleY(1f)
@@ -395,9 +394,8 @@ public final class FloatingManager {
                         ViewGroup parent = (ViewGroup) view.getParent();
                         float x = initialX + event.getRawX() - initialTouchX;
                         float y = initialY + event.getRawY() - initialTouchY;
-                        float[] bounds = safeBounds(parent, view);
-                        view.setX(Math.max(bounds[0], Math.min(x, bounds[2])));
-                        view.setY(Math.max(bounds[1], Math.min(y, bounds[3])));
+                        view.setX(Math.max(0f, Math.min(x, parent.getWidth() - view.getWidth())));
+                        view.setY(Math.max(0f, Math.min(y, parent.getHeight() - view.getHeight())));
                         return true;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
@@ -432,44 +430,17 @@ public final class FloatingManager {
     private void snapAndSave(View view) {
         if (!(view.getParent() instanceof ViewGroup)) return;
         ViewGroup parent = (ViewGroup) view.getParent();
-        float[] bounds = safeBounds(parent, view);
-        float maxX = bounds[2] - bounds[0];
-        float maxY = bounds[3] - bounds[1];
+        float maxX = Math.max(0f, parent.getWidth() - view.getWidth());
+        float maxY = Math.max(0f, parent.getHeight() - view.getHeight());
         float targetX = view.getX() + view.getWidth() / 2f < parent.getWidth() / 2f
-                ? bounds[0] : bounds[2];
+                ? 0f : maxX;
         ObjectAnimator.ofFloat(view, "x", targetX).setDuration(180L).start();
         Activity activity = currentActivity();
         if (activity != null) {
             WFStorage.getInstance(activity).saveBubblePosition(
-                    maxX == 0 ? 0.5f : (targetX - bounds[0]) / maxX,
-                    maxY == 0 ? 0.5f : (view.getY() - bounds[1]) / maxY);
+                    maxX == 0 ? 1f : targetX / maxX,
+                    maxY == 0 ? 0.5f : view.getY() / maxY);
         }
-    }
-
-    /** Coordinates relative to parent; only subtract bars when content actually draws behind them. */
-    private static float[] safeBounds(ViewGroup parent, View button) {
-        float left = 0f, top = 0f, right = parent.getWidth(), bottom = parent.getHeight();
-        if (android.os.Build.VERSION.SDK_INT >= 30) {
-            WindowInsets wi = parent.getRootWindowInsets();
-            if (wi != null) {
-                Insets bars = wi.getInsets(WindowInsets.Type.systemBars()
-                        | WindowInsets.Type.displayCutout());
-                int[] parentScreen = new int[2];
-                parent.getLocationOnScreen(parentScreen);
-                View root = parent.getRootView();
-                int[] rootScreen = new int[2];
-                root.getLocationOnScreen(rootScreen);
-                // Insets are window-relative; avoid applying top inset twice to a content view
-                // already laid out below the status bar.
-                left = Math.max(0f, rootScreen[0] + bars.left - parentScreen[0]);
-                top = Math.max(0f, rootScreen[1] + bars.top - parentScreen[1]);
-                right = Math.min(right, rootScreen[0] + root.getWidth() - bars.right - parentScreen[0]);
-                bottom = Math.min(bottom, rootScreen[1] + root.getHeight() - bars.bottom - parentScreen[1]);
-            }
-        }
-        right = Math.max(left, right - button.getWidth());
-        bottom = Math.max(top, bottom - button.getHeight());
-        return new float[]{left, top, right, bottom};
     }
 
     private void openPanel() {

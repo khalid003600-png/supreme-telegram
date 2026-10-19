@@ -31,9 +31,9 @@ jobs:
       contents: write
 
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@v4
     - name: Set up JDK 17
-      uses: actions/setup-java@b843ebf1fcdcf0eafdd153c2108f8645896b4540 # v4
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
@@ -41,7 +41,7 @@ jobs:
     # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
     # The setup-gradle action is used to provide a system `gradle` command when the wrapper is not present.
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      uses: gradle/actions/setup-gradle@v4
       with:
         gradle-version: '8.9'
 

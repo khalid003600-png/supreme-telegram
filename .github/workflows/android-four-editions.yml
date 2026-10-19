@@ -54,6 +54,7 @@ jobs:
           java -cp /tmp/beacon-check BeaconPayloadCheck
       - name: Compile and run unit tests
         id: tests
+        continue-on-error: true
         run: bash ./gradlew --no-daemon :app:testDebugUnitTest :app:lintDebug
       - name: Assemble unsigned release
         run: bash ./gradlew --no-daemon :app:assembleRelease
@@ -82,3 +83,9 @@ jobs:
             app/build/test-results/
             app/build/reports/
           if-no-files-found: warn
+
+      - name: Report test failures after preserving APK artifacts
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo '::error::Unit tests or lint failed; release APK was built separately for diagnosis.'
+          exit 1

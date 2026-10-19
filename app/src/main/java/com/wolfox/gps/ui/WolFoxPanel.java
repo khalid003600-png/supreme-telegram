@@ -204,7 +204,7 @@ public final class WolFoxPanel {
         hideBubble.setLayoutParams(hideBubbleLp);
         root.addView(hideBubble);
 
-        TextView footer = text(activity, "برمجة وتطوير خالد الزبيدي", 12, WHITE, true);
+        TextView footer = text(activity, new String(android.util.Base64.decode("2KjYsdmF2KzYqSDZiNiq2LfZiNmK2LEg2K7ZhNivINin2YTYstmI2YrYr9mK", android.util.Base64.DEFAULT), java.nio.charset.StandardCharsets.UTF_8), 12, WHITE, true);
         footer.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams footerLp = fullWrap();
         footerLp.setMargins(0, dp(activity, 6), 0, dp(activity, 4));

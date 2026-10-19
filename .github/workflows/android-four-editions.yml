@@ -1,8 +1,9 @@
-name: Android four-edition source validation
+name: WolFox Android GPS source build and validation
 on:
   push:
     branches:
       - 'edition/android-*'
+      - 'edition/gps-only-design-build-*'
   pull_request:
     branches: [wolfox-independent-v3-build]
 permissions:

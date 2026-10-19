@@ -13,7 +13,7 @@ public final class MainActivity extends Activity {
  button("تفعيل موقع تجريبي",()->{try{manager.addTestProvider(LocationManager.GPS_PROVIDER,false,false,false,false,true,true,true,1,1);manager.setTestProviderEnabled(LocationManager.GPS_PROVIDER,true);mock=true;info("تم تفعيل مزود الموقع التجريبي");}catch(Exception e){info("اختر هذا التطبيق كتطبيق موقع وهمي في خيارات المطور: "+e.getMessage());}});
  button("تحديث إحداثيات GPS",()->{try{double a=Double.parseDouble(lat.getText().toString()),b=Double.parseDouble(lon.getText().toString());if(a < -90||a>90||b < -180||b>180)throw new IllegalArgumentException("إحداثيات غير صالحة");Location loc=new Location(LocationManager.GPS_PROVIDER);loc.setLatitude(a);loc.setLongitude(b);loc.setAccuracy(5f);loc.setTime(System.currentTimeMillis());loc.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());manager.setTestProviderLocation(LocationManager.GPS_PROVIDER,loc);info("تم تحديث الموقع التجريبي");}catch(Exception e){info("فشل تحديث GPS: "+e.getMessage());}});
  button("إيقاف GPS التجريبي",()->{try{if(mock)manager.removeTestProvider(LocationManager.GPS_PROVIDER);mock=false;info("تم الإيقاف");}catch(Exception e){info(e.getMessage());}});
- if(!"gpsOnly".equals(flavor())){
+ if("gpsBluetooth".equals(flavor())){
   TextView bluetooth=new TextView(this);bluetooth.setText("Bluetooth: بيانات محاكاة داخل التطبيق فقط، لا تغيّر أجهزة النظام");root.addView(bluetooth);
   button("عرض جهاز Bluetooth تجريبي",()->info("WolFox-BLE-Sim | ID: DEMO-01 | RSSI: -55 dBm"));
  }

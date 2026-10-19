@@ -181,7 +181,8 @@ public final class ActivationDialog {
         LinearLayout.LayoutParams subscriptionLp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         subscriptionLp.setMargins(0, dp(activity, 8), 0, 0);
-        subscriptionDetails.setVisibility(android.view.View.GONE);\n        root.addView(subscriptionDetails, subscriptionLp);
+        subscriptionDetails.setVisibility(android.view.View.GONE);
+        root.addView(subscriptionDetails, subscriptionLp);
         subscriptionDetails.setOnClickListener(v -> {
             dialog.dismiss();
             current = null;

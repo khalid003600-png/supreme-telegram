@@ -55,7 +55,7 @@ public final class ActivationDialog {
                 current.show();
                 Window w = current.getWindow();
                 if (w != null) {
-                    w.setLayout((int) (activity.getResources().getDisplayMetrics().widthPixels * 0.92f),
+                    w.setLayout((int) (activity.getResources().getDisplayMetrics().widthPixels * 0.96f),
                             dialogHeight(activity));
                     w.setGravity(Gravity.CENTER);
                 }
@@ -111,7 +111,7 @@ public final class ActivationDialog {
         root.addView(title, titleLp);
 
         TextView subtitle = text(activity,
-                "أدخل كود الترخيص للمتابعة. لن تظهر أي ميزة قبل نجاح التفعيل.",
+                "أدخل كود التفعيل للمتابعة",
                 13, MUTED, false);
         subtitle.setGravity(Gravity.CENTER);
         root.addView(subtitle, fullWrap());
@@ -119,7 +119,7 @@ public final class ActivationDialog {
         EditText input = new EditText(activity);
         input.setSingleLine(true);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-        input.setHint("WFX0123456789ABCDEF");
+        input.setHint("أدخل كود التفعيل");
         input.setHintTextColor(MUTED);
         input.setTextColor(TEXT);
         input.setContentDescription("رمز التفعيل");
@@ -132,7 +132,25 @@ public final class ActivationDialog {
         LinearLayout.LayoutParams inputLp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, dp(activity, 52));
         inputLp.setMargins(0, dp(activity, 18), 0, dp(activity, 10));
-        root.addView(input, inputLp);
+        LinearLayout codeRow = new LinearLayout(activity);
+        codeRow.setOrientation(LinearLayout.HORIZONTAL);
+        codeRow.setLayoutDirection(android.view.View.LAYOUT_DIRECTION_LTR);
+        Button pasteInline = button(activity, "⧉", WFDesign.BUTTON_PASTE, TEXT);
+        pasteInline.setContentDescription("لصق كود التفعيل");
+        codeRow.addView(pasteInline, new LinearLayout.LayoutParams(dp(activity, 52), dp(activity, 52)));
+        LinearLayout.LayoutParams fieldLp = new LinearLayout.LayoutParams(0, dp(activity, 52), 1f);
+        fieldLp.setMargins(dp(activity, 8), 0, 0, 0);
+        codeRow.addView(input, fieldLp);
+        root.addView(codeRow, inputLp);
+        pasteInline.setOnClickListener(v -> {
+            ClipboardManager cm = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+            if (cm != null && cm.hasPrimaryClip() && cm.getPrimaryClip() != null
+                    && cm.getPrimaryClip().getItemCount() > 0) {
+                CharSequence value = cm.getPrimaryClip().getItemAt(0).coerceToText(activity);
+                input.setText(value == null ? "" : value.toString().trim());
+                input.setSelection(input.length());
+            }
+        });
 
         LinearLayout tools = new LinearLayout(activity);
         tools.setOrientation(LinearLayout.HORIZONTAL);
@@ -152,7 +170,7 @@ public final class ActivationDialog {
         progress.setVisibility(ProgressBar.GONE);
         root.addView(progress, new LinearLayout.LayoutParams(dp(activity, 32), dp(activity, 32)));
 
-        Button activate = button(activity, "تفعيل الآن", BLUE, Color.WHITE);
+        Button activate = button(activity, "تفعيل", BLUE, Color.WHITE);
         LinearLayout.LayoutParams activateLp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         activateLp.setMargins(0, dp(activity, 8), 0, 0);
@@ -163,7 +181,7 @@ public final class ActivationDialog {
         LinearLayout.LayoutParams subscriptionLp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         subscriptionLp.setMargins(0, dp(activity, 8), 0, 0);
-        root.addView(subscriptionDetails, subscriptionLp);
+        subscriptionDetails.setVisibility(android.view.View.GONE);\n        root.addView(subscriptionDetails, subscriptionLp);
         subscriptionDetails.setOnClickListener(v -> {
             dialog.dismiss();
             current = null;

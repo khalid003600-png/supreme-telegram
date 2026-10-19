@@ -209,14 +209,14 @@ public class SettingsDialog {
         // تُعرض بيانات الاشتراك في شاشة مستقلة عن إعدادات الموقع والأيقونة.
         root.addView(buildSectionLabel(activity, "إدارة الاشتراك"));
         TextView subscriptionHint = new TextView(activity);
-        subscriptionHint.setText("تفاصيل الحالة والبداية والانتهاء والمدة متاحة في قسم الاشتراك.");
+        subscriptionHint.setText(storage.getLicenseSummaryText());
         subscriptionHint.setTextColor(COLOR_WHITE);
         subscriptionHint.setTextSize(12);
         subscriptionHint.setPadding(dp(activity, 10), dp(activity, 8),
                 dp(activity, 10), dp(activity, 8));
         subscriptionHint.setBackground(WFDesign.rounded(COLOR_CARD, 10, WFDesign.BORDER, 1));
         root.addView(subscriptionHint);
-        Button openSubscription = WFDesign.button(activity, "فتح تفاصيل الاشتراك",
+        Button openSubscription = WFDesign.button(activity, "تفاصيل الاشتراك والتحقق",
                 WFDesign.SURFACE_RAISED, COLOR_WHITE);
         openSubscription.setOnClickListener(v -> {
             dialog.dismiss();
@@ -224,6 +224,21 @@ public class SettingsDialog {
         });
         root.addView(openSubscription);
 
+        root.addView(buildSectionLabel(activity, "المواقع المحفوظة"));
+        Button savedLocations = WFDesign.button(activity, "عرض المفضلة والمواقع المحفوظة",
+                WFDesign.SURFACE_RAISED, COLOR_WHITE);
+        savedLocations.setOnClickListener(v -> {
+            dialog.dismiss();
+            FavoritesDialog.show(activity);
+        });
+        root.addView(savedLocations);
+
+        root.addView(buildSectionLabel(activity, "معلومات التطبيق"));
+        TextView versionInfo = new TextView(activity);
+        versionInfo.setText("WolFox GPS " + com.wolfox.gps.ModuleConfig.VERSION_NAME
+                + " • النسخة 5");
+        versionInfo.setTextColor(COLOR_WHITE);
+        root.addView(versionInfo);
         addSpacing(root, activity, 16);
 
         // ─ أزرار ─

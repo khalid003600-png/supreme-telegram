@@ -224,14 +224,7 @@ public class SettingsDialog {
         });
         root.addView(openSubscription);
 
-        root.addView(buildSectionLabel(activity, "المواقع المحفوظة"));
-        Button savedLocations = WFDesign.button(activity, "عرض المفضلة والمواقع المحفوظة",
-                WFDesign.SURFACE_RAISED, COLOR_WHITE);
-        savedLocations.setOnClickListener(v -> {
-            dialog.dismiss();
-            FavoritesDialog.show(activity);
-        });
-        root.addView(savedLocations);
+        // Saved locations are managed exclusively from the Favorites section.
 
         root.addView(buildSectionLabel(activity, "معلومات التطبيق"));
         TextView versionInfo = new TextView(activity);

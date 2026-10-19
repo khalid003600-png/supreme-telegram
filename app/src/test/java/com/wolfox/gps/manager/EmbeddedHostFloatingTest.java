@@ -131,9 +131,10 @@ public class EmbeddedHostFloatingTest {
         appContext.getSharedPreferences(STORAGE_PREFS, Context.MODE_PRIVATE).edit()
                 .putBoolean(KEY_BUBBLE_VISIBLE, false).commit();
         assertFalse(ToolControlManager.getInstance().isBlocked(alpha));
-        // Policy is scoped to the host application's preferences, not the module app.
-        alpha.getSharedPreferences(CONTROL_PREFS, Context.MODE_PRIVATE)
+        // Set the cached policy through the same application context used by the host.
+        alpha.getApplicationContext().getSharedPreferences(CONTROL_PREFS, Context.MODE_PRIVATE)
                 .edit().putBoolean("blocked", true).commit();
+        assertTrue(ToolControlManager.getInstance().isBlocked(alpha.getApplicationContext()));
         assertTrue(ToolControlManager.getInstance().isBlocked(alpha));
 
         DirectBootstrap.showControls(alpha);

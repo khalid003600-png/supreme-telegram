@@ -1,0 +1,43 @@
+name: Bundle four WolFox source editions
+on:
+  push:
+    paths:
+      - '.github/workflows/wolfox-source-bundle.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bundle:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: GPS source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: edition/android-gps-20261019
+          path: WolFox-GPS
+      - name: GPS Bluetooth source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: edition/android-gps-bluetooth-20261019
+          path: WolFox-GPS-Bluetooth
+      - name: GPS media UUID source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: edition/android-gps-upload-identifier-20261019
+          path: WolFox-GPS-Media-UUID
+      - name: Full source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: edition/android-full-20261019
+          path: WolFox-Full
+      - name: Create one source archive
+        run: |
+          rm -rf WolFox-{GPS,GPS-Bluetooth,GPS-Media-UUID,Full}/.git
+          zip -q -r WolFox-All-Four-Sources.zip WolFox-GPS WolFox-GPS-Bluetooth WolFox-GPS-Media-UUID WolFox-Full
+          unzip -tq WolFox-All-Four-Sources.zip
+      - name: Upload complete source archive
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: WolFox-All-Four-Sources
+          path: WolFox-All-Four-Sources.zip
+          if-no-files-found: error

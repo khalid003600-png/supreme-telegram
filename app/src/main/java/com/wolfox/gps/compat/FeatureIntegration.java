@@ -540,7 +540,13 @@ public final class FeatureIntegration {
         Window window = dialog.getWindow();
         if (window != null) {
             int width = (int) (activity.getResources().getDisplayMetrics().widthPixels * 0.94f);
+            int maxHeight = (int) (activity.getResources().getDisplayMetrics().heightPixels * 0.82f);
             window.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+            window.getDecorView().post(() -> {
+                if (dialog.isShowing() && window.getDecorView().getHeight() > maxHeight) {
+                    window.setLayout(width, maxHeight);
+                }
+            });
         }
         return dialog;
     }

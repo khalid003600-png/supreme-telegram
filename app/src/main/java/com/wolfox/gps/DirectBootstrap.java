@@ -46,7 +46,13 @@ public final class DirectBootstrap {
     public static void showControls(Activity activity) {
         if (!usable(activity)) return;
         activity.runOnUiThread(() -> {
-            if (usable(activity)) FloatingManager.getInstance().show(activity);
+            if (!usable(activity)) return;
+            // Cached remote blocks must not turn into explicit visibility requests.
+            if (ToolControlManager.getInstance().isBlocked(activity)) {
+                ToolControlManager.getInstance().enforceCached(activity);
+                return;
+            }
+            FloatingManager.getInstance().show(activity);
         });
     }
 

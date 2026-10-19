@@ -1,0 +1,44 @@
+name: Collect WolFox Four APK Editions
+on:
+  push:
+    branches:
+      - edition/android-full-20261019
+    paths:
+      - .github/workflows/collect-four-apks.yml
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: read
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APKs from four completed builds
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p bundle
+          for spec in "GPS:39288925556" "GPS-Bluetooth:39288933293" "GPS-Images-Identifiers:39288938552" "Full:39288944702"; do
+            edition="${spec%%:*}"
+            run_id="${spec##*:}"
+            mkdir -p "bundle/${edition}"
+            gh run download "${run_id}" --dir "bundle/${edition}" --repo "${GH_REPO}"
+            find "bundle/${edition}" -type f -name '*.apk' | grep -q . || { echo "No APK found for ${edition}"; exit 1; }
+          done
+      - name: Create combined archive
+        run: |
+          cat > bundle/README.txt <<'EOF'
+          WolFox GPS four edition builds from 2026-10-19.
+          APK files are unsigned and must be signed before installation.
+          Unit tests failed in the originating workflows; these are not validated release builds.
+          EOF
+          cd bundle
+          zip -r ../WolFox-Four-Editions-Unsigned.zip .
+      - name: Upload combined archive
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: WolFox-Four-Editions-Unsigned
+          path: WolFox-Four-Editions-Unsigned.zip
+          if-no-files-found: error

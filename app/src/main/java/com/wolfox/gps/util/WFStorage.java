@@ -60,8 +60,11 @@ public class WFStorage {
     private final SharedPreferences prefs;
 
     private WFStorage(Context context) {
-        prefs = context.getApplicationContext()
-                       .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        // Use the same application-scoped preferences for both production and Robolectric.
+        // Never cache an Activity context.
+        Context app = context.getApplicationContext();
+        prefs = (app == null ? context : app)
+                .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
     public static synchronized WFStorage getInstance(Context context) {

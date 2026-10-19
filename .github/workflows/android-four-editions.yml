@@ -1,0 +1,43 @@
+name: Android four-edition source validation
+on:
+  push:
+    branches:
+      - 'edition/android-*'
+  pull_request:
+    branches: [wolfox-independent-v3-build]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager 'platforms;android-34' 'build-tools;34.0.0'
+      - name: Check source contract and payload bytes
+        run: |
+          python3 tests/verify_four_editions.py
+          python3 tests/verify_design_palette.py
+          python3 tests/verify_safe_device_tools.py
+          mkdir -p /tmp/beacon-check
+          javac -d /tmp/beacon-check app/src/main/java/com/wolfox/gps/compat/BeaconPayload.java verification/beacon/BeaconPayloadCheck.java
+          java -cp /tmp/beacon-check BeaconPayloadCheck
+      - name: Compile and run unit tests
+        id: tests
+        run: bash ./gradlew --no-daemon :app:testDebugUnitTest :app:lintDebug
+      - name: Assemble unsigned release
+        run: bash ./gradlew --no-daemon :app:assembleRelease
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: WolFox-Android-${{ github.sha }}
+          path: |
+            app/build/outputs/apk/release/*unsigned.apk
+            app/build/test-results/
+            app/build/reports/
+          if-no-files-found: warn

@@ -6,7 +6,7 @@ android {
     defaultConfig {
         minSdk 21
         targetSdk 34
-        applicationId 'com.wolfox.gps.variant3'
+        applicationId 'com.wolfox.gps.edition.full'
         versionCode 313
         versionName "3.1.1"
     }

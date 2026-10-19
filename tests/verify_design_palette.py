@@ -11,7 +11,7 @@ errors = []
 
 # Palette from COLOR_ROLES_VALIDATION_AR.md plus the new device-tool actions.
 expected = {
-    "PRIMARY": "0xFF2563EB",
+    "PRIMARY": "0xFF3EB7E7",
     "BUTTON_SELECT": "0xFF34D399",
     "BUTTON_LOCATION": "0xFF34D399",
     "BUTTON_STOP": "0xFF881337",

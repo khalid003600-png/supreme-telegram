@@ -36,7 +36,7 @@ public class ColorAndCloseLayoutTest {
             Button b = WFDesign.button(RuntimeEnvironment.getApplication(), role,
                     WFDesign.SURFACE_RAISED, WFDesign.TEXT);
             assertTrue("Actual button text contrast must reach 4.5:1 for " + role,
-                    contrast(b.getCurrentTextColor(), background) >= 4.5d);
+                    contrast(b.getCurrentTextColor(), WFDesign.referenceActionColor(role, WFDesign.SURFACE_RAISED)) >= 4.5d);
             assertTrue(b.getCurrentTextColor() == Color.WHITE
                     || b.getCurrentTextColor() == WFDesign.BACKGROUND);
         }

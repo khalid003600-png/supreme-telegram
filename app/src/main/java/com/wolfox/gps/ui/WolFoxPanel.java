@@ -55,8 +55,14 @@ public final class WolFoxPanel {
         activity.runOnUiThread(() -> {
             if (activity.isFinishing() || activity.isDestroyed()) return;
             dismiss();
-            currentDialog = buildDialog(activity);
-            currentDialog.show();
+            try {
+                currentDialog = buildDialog(activity);
+                currentDialog.show();
+            } catch (RuntimeException | LinkageError failure) {
+                dismiss();
+                com.wolfox.gps.util.SafeUi.report(activity, "فتح اللوحة", failure);
+                return;
+            }
             Window window = currentDialog.getWindow();
             if (window != null) {
                 window.setLayout((int) (activity.getResources().getDisplayMetrics().widthPixels * 0.94f),
@@ -87,6 +93,9 @@ public final class WolFoxPanel {
         root.setBackground(round(BG, 22, WFDesign.BORDER, 1));
 
         root.addView(header(activity, dialog));
+        TextView edition = text(activity, com.wolfox.gps.EditionConfig.LABEL, 13, MUTED, true);
+        edition.setGravity(Gravity.CENTER);
+        root.addView(edition);
 
         final MapDialog.Preview preview = MapDialog.createPreview(activity, v -> {
             dialog.dismiss();
@@ -191,11 +200,19 @@ public final class WolFoxPanel {
             SettingsDialog.show(activity);
         }));
 
-        root.addView(row(activity,
-                action(activity, "فحص أجهزة البلوتوث", view ->
-                        com.wolfox.gps.compat.FeatureIntegration.showBluetooth(activity)),
-                action(activity, "الكاميرا والصور", view ->
-                        com.wolfox.gps.compat.FeatureIntegration.showCamera(activity))));
+        root.addView(action(activity, "الحركة والسرعة", view -> {
+            dialog.dismiss();
+            MovementDialog.show(activity);
+        }));
+        if (com.wolfox.gps.EditionConfig.HAS_BLUETOOTH) {
+            root.addView(action(activity, "البلوتوث والأجهزة", view ->
+                    com.wolfox.gps.compat.FeatureIntegration.showBluetooth(activity)));
+        }
+        if (com.wolfox.gps.EditionConfig.HAS_MEDIA) {
+            root.addView(action(activity, "الكاميرا والصور", view ->
+                    com.wolfox.gps.compat.FeatureIntegration.showCamera(activity)));
+            root.addView(action(activity, "المعرّف التجريبي UUID", view -> IdentifierDialog.show(activity)));
+        }
         Button hideBubble = action(activity, WFTheme.icon("○") + "  إخفاء الأيقونة",
                 v -> FloatingManager.getInstance().requestHideConfirmation(activity));
         LinearLayout.LayoutParams hideBubbleLp = fullWrap();
@@ -332,7 +349,7 @@ public final class WolFoxPanel {
 
     private static Button action(Context context, String label, View.OnClickListener listener) {
         Button button = button(context, label, CARD_2, WHITE);
-        button.setOnClickListener(listener);
+        button.setOnClickListener(view -> com.wolfox.gps.util.SafeUi.run(context, label, () -> listener.onClick(view)));
         return button;
     }
 

@@ -220,12 +220,6 @@ public final class WolFoxPanel {
         hideBubble.setLayoutParams(hideBubbleLp);
         root.addView(hideBubble);
 
-        TextView footer = text(activity, new String(android.util.Base64.decode("2KjYsdmF2KzYqSDZiNiq2LfZiNmK2LEg2K7Yp9mE2K8g2KfZhNiy2KjZitiv2Yo=", android.util.Base64.DEFAULT), java.nio.charset.StandardCharsets.UTF_8), 12, WHITE, true);
-        footer.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams footerLp = fullWrap();
-        footerLp.setMargins(0, dp(activity, 6), 0, dp(activity, 4));
-        root.addView(footer, footerLp);
-
         WFDesign.moveCloseToFooter(root);
         WFTheme.applyTree(root);
         ScrollView scroll = new ScrollView(activity);

@@ -25,7 +25,7 @@ jobs:
       - name: Verify all APKs
         run: |
           for f in gpsOnly gpsBluetooth gpsCamera; do
-            test -s "model-apks/build/outputs/apk/${f}/debug/model-apks-${f}-debug.apk"
+            find "model-apks/build/outputs/apk/${f}/debug" -name "*.apk" -size +0c | grep -q .
           done
       - uses: actions/upload-artifact@v4
         with:

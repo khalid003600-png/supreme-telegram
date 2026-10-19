@@ -3,6 +3,6 @@
   "application_id": "com.wolfox.gps.edition.gps.bluetooth",
   "ios_repository": "khalid003600-png/H",
   "ios_branch": "sandbox/wolfox-variant-gps-bluetooth-20261019",
-  "ios_commit": "dd210e044181694b89c38c6e5a65f9201890c7a9",
+  "ios_commit": "6b230e10474edc3d9e02939fb82d0ea1ccab4755",
   "android_base_commit": "f1a4b3495585373f7bd80552870a3f17feb27539"
 }

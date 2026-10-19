@@ -78,6 +78,7 @@ public final class FeatureIntegration {
     private FeatureIntegration() {}
 
     public static synchronized void init(Context context) {
+        if (!com.wolfox.gps.EditionConfig.HAS_MEDIA) return;
         if (resultHooked) return;
         try {
             XposedBridge.hookAllMethods(Instrumentation.class, "callActivityOnActivityResult",
@@ -106,6 +107,11 @@ public final class FeatureIntegration {
     }
 
     public static void showCamera(Activity activity) {
+        if (!com.wolfox.gps.EditionConfig.HAS_MEDIA) return;
+        com.wolfox.gps.util.SafeUi.run(activity, "فتح القسم", () -> buildshowCamera(activity));
+    }
+
+    private static void buildshowCamera(Activity activity) {
         if (!usable(activity)) return;
         LinearLayout root = root(activity);
         TextView note = WFDesign.text(activity,
@@ -149,6 +155,25 @@ public final class FeatureIntegration {
         choicesLp.setMargins(0, WFDesign.dp(activity, 10), 0, WFDesign.dp(activity, 6));
         root.addView(choices, choicesLp);
 
+        Button share = WFDesign.button(activity, "مشاركة الصورة المختارة", WFDesign.BUTTON_CAMERA,
+                WFDesign.TEXT);
+        root.addView(share, fullWrap());
+        share.setOnClickListener(view -> {
+            Uri uri = selectedImage;
+            if (uri == null || !"content".equalsIgnoreCase(uri.getScheme())) {
+                Toast.makeText(activity, "اختر صورة من الاستديو أولًا للمشاركة", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent send = new Intent(Intent.ACTION_SEND);
+            send.setType("image/*");
+            send.putExtra(Intent.EXTRA_STREAM, uri);
+            send.setClipData(android.content.ClipData.newRawUri("WolFox image", uri));
+            send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            try { activity.startActivity(Intent.createChooser(send, "مشاركة الصورة")); }
+            catch (RuntimeException error) {
+                Toast.makeText(activity, "تعذرت مشاركة الصورة", Toast.LENGTH_SHORT).show();
+            }
+        });
         Button clear = WFDesign.button(activity, "مسح المعاينة", WFDesign.BUTTON_CLEAR,
                 WFDesign.BACKGROUND);
         root.addView(clear, fullWrap());
@@ -168,6 +193,11 @@ public final class FeatureIntegration {
     }
 
     public static void showBluetooth(Activity activity) {
+        if (!com.wolfox.gps.EditionConfig.HAS_BLUETOOTH) return;
+        com.wolfox.gps.util.SafeUi.run(activity, "فتح القسم", () -> buildshowBluetooth(activity));
+    }
+
+    private static void buildshowBluetooth(Activity activity) {
         if (!usable(activity)) return;
         stopScan();
         synchronized (DISCOVERED_LOCK) { discovered.clear(); }
@@ -208,6 +238,13 @@ public final class FeatureIntegration {
         Button selectDevice = WFDesign.button(activity, "اختيار جهاز من نتائج الفحص",
                 WFDesign.BUTTON_BLUETOOTH, WFDesign.TEXT);
         root.addView(selectDevice, fullWrap());
+        Button beacon = WFDesign.button(activity, "محاكاة Beacon و UUID",
+                WFDesign.BUTTON_BLUETOOTH, WFDesign.TEXT);
+        root.addView(beacon, fullWrap());
+        beacon.setOnClickListener(view -> {
+            stopScan();
+            BeaconTools.show(activity);
+        });
         Button settings = WFDesign.button(activity, "إعدادات Bluetooth", WFDesign.BUTTON_SETTINGS,
                 WFDesign.TEXT);
         root.addView(settings, fullWrap());
@@ -254,6 +291,7 @@ public final class FeatureIntegration {
     }
 
     public static void onImageSelected(int requestCode, int resultCode, Intent data) {
+        if (!com.wolfox.gps.EditionConfig.HAS_MEDIA) return;
         if (resultCode != Activity.RESULT_OK) return;
         if (data == null) {
             TextView status = cameraStatus.get();

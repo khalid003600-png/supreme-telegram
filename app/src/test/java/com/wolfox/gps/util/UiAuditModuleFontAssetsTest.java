@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 34)
 public class UiAuditModuleFontAssetsTest {
-    private static final String FONT = "wolfox/fonts/DINNextLTArabic-Regular.otf";
+    private static final String FONT = "wolfox/fonts/Cairo-Variable.ttf";
 
     private static ClassLoader fixture(byte[] bytes, AtomicInteger reads) {
         return new ClassLoader(null) {
@@ -57,7 +57,7 @@ public class UiAuditModuleFontAssetsTest {
         } catch (IllegalArgumentException expected) { }
         try {
             WFTheme.materializeFont(context, FONT,
-                    fixture(new byte[512 * 1024 + 1], new AtomicInteger()));
+                    fixture(new byte[1024 * 1024 + 1], new AtomicInteger()));
             fail("Oversized fonts must be refused before any cache write");
         } catch (java.io.IOException expected) { }
         try {

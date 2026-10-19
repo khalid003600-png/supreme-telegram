@@ -21,9 +21,9 @@ import java.util.Locale;
 
 /** Shared Arabic typography. Module fonts load off the UI thread, including embedded APKs. */
 public final class WFTheme {
-    private static final String MEDIUM_ASSET = "wolfox/fonts/DINNextLTArabic-Medium.ttf";
-    private static final String REGULAR_ASSET = "wolfox/fonts/DINNextLTArabic-Regular.otf";
-    private static final int MAX_FONT_BYTES = 512 * 1024;
+    private static final String MEDIUM_ASSET = "wolfox/fonts/Cairo-Variable.ttf";
+    private static final String REGULAR_ASSET = "wolfox/fonts/Cairo-Variable.ttf";
+    private static final int MAX_FONT_BYTES = 1024 * 1024;
     private static final Object FONT_LOCK = new Object();
     private static final Typeface FALLBACK_MEDIUM = Typeface.create("sans-serif", Typeface.BOLD);
     private static final Typeface FALLBACK_REGULAR = Typeface.create("sans-serif", Typeface.NORMAL);
@@ -141,8 +141,8 @@ public final class WFTheme {
     private static Typeface load(Context context, String asset, int fallbackStyle) {
         try {
             File font = materializeFont(context, asset, WFTheme.class.getClassLoader());
-            if (font != null) return Typeface.createFromFile(font);
-            return Typeface.createFromAsset(context.getAssets(), asset);
+            if (font != null) return Typeface.create(Typeface.createFromFile(font), fallbackStyle);
+            return Typeface.create(Typeface.createFromAsset(context.getAssets(), asset), fallbackStyle);
         } catch (Exception | LinkageError ignored) {
             return Typeface.create("sans-serif", fallbackStyle);
         }

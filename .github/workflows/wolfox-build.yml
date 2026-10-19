@@ -15,15 +15,20 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
       - name: Install Android SDK
         shell: bash
         run: |
           set -euo pipefail
+          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          export ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -1)"
+          test -x "$SDKMANAGER"
           set +o pipefail
-          yes | sdkmanager --licenses >/dev/null
+          yes | "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null
           set -o pipefail
-          sdkmanager --install 'platforms;android-34' 'build-tools;34.0.0'
+          "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" --install 'platforms;android-34' 'build-tools;34.0.0'
       - name: Build and verify unsigned APK
         shell: bash
         run: |

@@ -2,6 +2,7 @@ plugins { id 'com.android.application' version '8.6.1' }
 android {
  namespace 'com.wolfox.model'
  compileSdk 35
+ buildFeatures { buildConfig true }
  defaultConfig { applicationId 'com.wolfox.model'; minSdk 26; targetSdk 35; versionCode 1; versionName '1.0.0' }
  flavorDimensions 'model'
  productFlavors {

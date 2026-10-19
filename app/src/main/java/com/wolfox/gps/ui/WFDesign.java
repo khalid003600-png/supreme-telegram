@@ -77,8 +77,8 @@ public final class WFDesign {
         button.setAllCaps(false);
         button.setText(label);
         button.setContentDescription(label);
-        button.setTextSize(14);
-        button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        button.setTextSize(15);
+        button.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
         button.setMinHeight(dp(context, 48));
         button.setMinimumHeight(dp(context, 48));
         button.setMinWidth(0);
@@ -287,7 +287,7 @@ public final class WFDesign {
         GradientDrawable shape = new GradientDrawable();
         shape.setColor(fill);
         shape.setCornerRadius(dp(context, 14));
-        shape.setStroke(dp(context, 1), edge);
+        shape.setStroke(Math.max(1, dp(context, 1)), 0xFFDBA84E);
         return shape;
     }
 

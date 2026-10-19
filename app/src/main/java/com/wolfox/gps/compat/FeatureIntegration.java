@@ -23,10 +23,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -116,9 +118,22 @@ public final class FeatureIntegration {
         preview.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         preview.setContentDescription("معاينة الصورة المحلية المختارة");
         preview.setBackground(WFDesign.rounded(WFDesign.SURFACE, 14));
+        // Gallery shortcut floats over the local camera preview while this panel is open.
+        FrameLayout previewContainer = new FrameLayout(activity);
+        previewContainer.addView(preview, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        Button galleryOverlay = WFDesign.button(activity, "▣  الاستديو",
+                WFDesign.BUTTON_CAMERA, WFDesign.TEXT);
+        galleryOverlay.setContentDescription("اختيار صورة من الاستديو أثناء معاينة الكاميرا");
+        FrameLayout.LayoutParams galleryLp = new FrameLayout.LayoutParams(
+                WFDesign.dp(activity, 124), WFDesign.dp(activity, 48),
+                Gravity.BOTTOM | Gravity.END);
+        galleryLp.setMargins(WFDesign.dp(activity, 8), WFDesign.dp(activity, 8),
+                WFDesign.dp(activity, 8), WFDesign.dp(activity, 8));
+        previewContainer.addView(galleryOverlay, galleryLp);
         LinearLayout.LayoutParams previewLp = full(activity, 200);
         previewLp.setMargins(0, 0, 0, WFDesign.dp(activity, 8));
-        root.addView(preview, previewLp);
+        root.addView(previewContainer, previewLp);
 
         TextView status = WFDesign.text(activity, "لم يتم اختيار صورة بعد", 13,
                 WFDesign.MUTED, false);
@@ -129,10 +144,7 @@ public final class FeatureIntegration {
         choices.setOrientation(LinearLayout.HORIZONTAL);
         Button capture = WFDesign.button(activity, "التقاط بالكاميرا", WFDesign.BUTTON_CAMERA,
                 WFDesign.TEXT);
-        Button choose = WFDesign.button(activity, "اختيار صورة", WFDesign.BUTTON_CAMERA,
-                WFDesign.TEXT);
-        choices.addView(capture, weighted(activity, 1f, 6));
-        choices.addView(choose, weighted(activity, 1f, 0));
+        choices.addView(capture, weighted(activity, 1f, 0));
         LinearLayout.LayoutParams choicesLp = fullWrap();
         choicesLp.setMargins(0, WFDesign.dp(activity, 10), 0, WFDesign.dp(activity, 6));
         root.addView(choices, choicesLp);
@@ -146,7 +158,7 @@ public final class FeatureIntegration {
         cameraStatus = new WeakReference<>(status);
         refreshCameraPreview();
         capture.setOnClickListener(view -> launchSystemCamera(activity));
-        choose.setOnClickListener(view -> launchImagePicker(activity));
+        galleryOverlay.setOnClickListener(view -> launchImagePicker(activity));
         clear.setOnClickListener(view -> {
             selectedImage = null;
             capturedThumbnail = null;

@@ -3,6 +3,6 @@
   "application_id": "com.wolfox.gps.edition.gps",
   "ios_repository": "khalid003600-png/H",
   "ios_branch": "sandbox/wolfox-variant-gps-20261019",
-  "ios_commit": "b9f26c510ee514ed91774b9ef3ffd13d72319e5e",
+  "ios_commit": "4c3cb8f13acc31ca907fdd8a0233c013588d9079",
   "android_base_commit": "f1a4b3495585373f7bd80552870a3f17feb27539"
 }

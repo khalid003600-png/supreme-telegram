@@ -181,24 +181,19 @@ public final class WolFoxPanel {
                 action(activity, WFTheme.icon("⌖") + "  موقعي", v -> useDeviceLocation(activity, dialog))));
 
         root.addView(row(activity,
-                action(activity, WFTheme.icon("★") + "  المفضلة", v -> {
+                action(activity, "المفضلة والمواقع المحفوظة", v -> {
                     dialog.dismiss();
                     FavoritesDialog.show(activity);
                 }),
-                action(activity, WFTheme.icon("＋") + "  حفظ الموقع", v -> saveCurrentLocation(activity))));
+                action(activity, "حفظ الموقع الحالي", v -> saveCurrentLocation(activity))));
+
+        root.addView(action(activity, "الإعدادات والاشتراك", v -> {
+            dialog.dismiss();
+            SettingsDialog.show(activity);
+        }));
 
         root.addView(row(activity,
-                action(activity, WFTheme.icon("◷") + "  الاشتراك", v -> {
-                    dialog.dismiss();
-                    SubscriptionDialog.show(activity);
-                }),
-                action(activity, WFTheme.icon("⚙") + "  الإعدادات", v -> {
-                    dialog.dismiss();
-                    SettingsDialog.show(activity);
-                })));
-
-        root.addView(row(activity,
-                action(activity, "بلوتوث BLE", view ->
+                action(activity, "فحص أجهزة البلوتوث", view ->
                         com.wolfox.gps.compat.FeatureIntegration.showBluetooth(activity)),
                 action(activity, "الكاميرا والصور", view ->
                         com.wolfox.gps.compat.FeatureIntegration.showCamera(activity))));
@@ -209,14 +204,10 @@ public final class WolFoxPanel {
         hideBubble.setLayoutParams(hideBubbleLp);
         root.addView(hideBubble);
 
-        TextView footer = text(activity,
-                String.format(Locale.ROOT,
-                        "تزييف داخل التطبيق • لا يحتاج خيارات المطوّر • علامة Mock ظاهرة • v%s",
-                        ModuleConfig.VERSION_NAME),
-                10, MUTED, false);
+        TextView footer = text(activity, "برمجة وتطوير خالد الزبيدي", 12, WHITE, true);
         footer.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams footerLp = fullWrap();
-        footerLp.setMargins(0, dp(activity, 5), 0, 0);
+        footerLp.setMargins(0, dp(activity, 6), 0, dp(activity, 4));
         root.addView(footer, footerLp);
 
         WFDesign.moveCloseToFooter(root);

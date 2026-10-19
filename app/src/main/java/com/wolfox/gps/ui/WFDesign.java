@@ -78,6 +78,7 @@ public final class WFDesign {
         button.setText(label);
         button.setContentDescription(label);
         button.setTextSize(14);
+        button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         button.setMinHeight(dp(context, 48));
         button.setMinimumHeight(dp(context, 48));
         button.setMinWidth(0);
@@ -91,7 +92,7 @@ public final class WFDesign {
         button.setBackgroundTintList(null);
         LinearLayout.LayoutParams spacing = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        spacing.setMargins(dp(context, 3), dp(context, 5), dp(context, 3), dp(context, 5));
+        spacing.setMargins(dp(context, 4), dp(context, 6), dp(context, 4), dp(context, 6));
         button.setLayoutParams(spacing);
         colorButton(button, label, background, foreground);
         button.setFocusable(true);
@@ -106,7 +107,7 @@ public final class WFDesign {
         if (value.contains("اغلاق") || value.contains("خروج") || value.contains("الغاء")) return BUTTON_CLOSE;
         if (value.contains("ايقاف")) return BUTTON_STOP;
         if (value.contains("تزييف")) return DANGER;
-        if (value.contains("بلوتوث") || value.contains("bluetooth") || value.contains("BLE")) return BUTTON_BLUETOOTH;
+        if (value.contains("بلوتوث") || value.contains("bluetooth") || value.contains("ble")) return BUTTON_BLUETOOTH;
         if (value.contains("كاميرا") || value.contains("اختيار صورة")) return BUTTON_CAMERA;
         if (value.contains("لصق")) return BUTTON_PASTE;
         if (value.contains("حذف") || value.contains("مسح الكل")) return BUTTON_DELETE;
@@ -142,7 +143,7 @@ public final class WFDesign {
             if (value == 'أ' || value == 'إ' || value == 'آ') value = 'ا';
             normalized.append(value);
         }
-        return normalized.toString().trim();
+        return normalized.toString().trim().toLowerCase(java.util.Locale.ROOT);
     }
 
     /** Graphite/cyan iOS reference: neutral actions, red stop/delete controls. */

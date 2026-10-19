@@ -74,6 +74,47 @@ jobs:
             "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$apk" | head -n 5
             sha256sum "$apk"
           done
+      - name: Assemble installable debug APK
+        run: bash ./gradlew --no-daemon :app:assembleDebug
+
+      - name: Verify generated APK files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s app/build/outputs/apk/debug/app-debug.apk
+          ls -lh app/build/outputs/apk/debug/*.apk app/build/outputs/apk/release/*.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Sign production release when signing secrets are configured
+        shell: bash
+        env:
+          WOLFOX_KEYSTORE_BASE64: ${{ secrets.WOLFOX_KEYSTORE_BASE64 }}
+          WOLFOX_KEYSTORE_PASSWORD: ${{ secrets.WOLFOX_KEYSTORE_PASSWORD }}
+          WOLFOX_KEY_ALIAS: ${{ secrets.WOLFOX_KEY_ALIAS }}
+          WOLFOX_KEY_PASSWORD: ${{ secrets.WOLFOX_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$WOLFOX_KEYSTORE_BASE64" || -z "$WOLFOX_KEYSTORE_PASSWORD" || -z "$WOLFOX_KEY_ALIAS" || -z "$WOLFOX_KEY_PASSWORD" ]]; then
+            echo 'Production signing secrets not configured; leaving unsigned release for signing later.'
+            exit 0
+          fi
+          umask 077
+          trap 'rm -f "$RUNNER_TEMP/wolfox-release.jks"' EXIT
+          printf '%s' "$WOLFOX_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/wolfox-release.jks"
+          unsigned="app/build/outputs/apk/release/app-release-unsigned.apk"
+          aligned="app/build/outputs/apk/release/app-release-aligned.apk"
+          signed="app/build/outputs/apk/release/WolFox-release-signed.apk"
+          test -s "$unsigned"
+          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -f -p 4 "$unsigned" "$aligned"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" sign \
+            --ks "$RUNNER_TEMP/wolfox-release.jks" \
+            --ks-key-alias "$WOLFOX_KEY_ALIAS" \
+            --ks-pass env:WOLFOX_KEYSTORE_PASSWORD \
+            --key-pass env:WOLFOX_KEY_PASSWORD \
+            --out "$signed" "$aligned"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose "$signed"
+          rm -f "$aligned"
+
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

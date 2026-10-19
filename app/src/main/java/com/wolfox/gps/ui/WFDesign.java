@@ -204,6 +204,8 @@ public final class WFDesign {
     public static void moveCloseToFooter(LinearLayout root) {
         Button close = findClose(root);
         if (close == null || !(close.getParent() instanceof ViewGroup)) return;
+        ensureButtonTouchTargets(root);
+        if (close.getParent() == root && root.indexOfChild(close) >= 0) return;
         if (close.getParent() == root && root.indexOfChild(close) >= 0) return;
         ((ViewGroup) close.getParent()).removeView(close);
         close.setText("إغلاق");
@@ -234,6 +236,26 @@ public final class WFDesign {
         creditLp.setMargins(0, dp(root.getContext(), 8), 0, dp(root.getContext(), 6));
         root.addView(credit, creditLp);
         root.addView(close, lp);
+    }
+
+    private static void ensureButtonTouchTargets(View view) {
+        if (view instanceof Button) {
+            Button button = (Button) view;
+            int minimum = dp(button.getContext(), 48);
+            button.setMinHeight(minimum);
+            button.setMinimumHeight(minimum);
+            ViewGroup.LayoutParams params = button.getLayoutParams();
+            if (params != null && params.height > 0 && params.height < minimum) {
+                params.height = minimum;
+                button.setLayoutParams(params);
+            }
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                ensureButtonTouchTargets(group.getChildAt(i));
+            }
+        }
     }
 
     private static Button findClose(View view) {

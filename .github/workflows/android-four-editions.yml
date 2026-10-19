@@ -28,6 +28,22 @@ jobs:
           test -x "$SDKMANAGER"
           yes | "$SDKMANAGER" --licenses >/dev/null || true
           "$SDKMANAGER" --install 'platforms;android-34' 'build-tools;34.0.0'
+      - name: Verify complete Android build toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "JAVA_HOME=$JAVA_HOME"
+          java -version
+          bash ./gradlew --version
+          test -f gradle/wrapper/gradle-wrapper.jar
+          test -f app/libs/xposed-api-82.jar
+          test -x "$ANDROID_HOME/platform-tools/adb"
+          for tool in aapt2 d8 zipalign apksigner; do
+            test -f "$ANDROID_HOME/build-tools/34.0.0/$tool" || { echo "::error::Missing $tool"; exit 1; }
+          done
+          test -f "$ANDROID_HOME/platforms/android-34/android.jar"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" --version
+          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -h >/dev/null 2>&1 || true
       - name: Check source contract and payload bytes
         run: |
           python3 tests/verify_four_editions.py
@@ -41,12 +57,28 @@ jobs:
         run: bash ./gradlew --no-daemon :app:testDebugUnitTest :app:lintDebug
       - name: Assemble unsigned release
         run: bash ./gradlew --no-daemon :app:assembleRelease
+      - name: Verify release APK output
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          apks=(app/build/outputs/apk/release/*.apk)
+          if [ "${#apks[@]}" -eq 0 ]; then
+            echo "::error::No release APK produced"
+            exit 1
+          fi
+          for apk in "${apks[@]}"; do
+            test -s "$apk"
+            "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$apk" | head -n 5
+            sha256sum "$apk"
+          done
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: WolFox-Android-${{ github.sha }}
           path: |
-            app/build/outputs/apk/release/*unsigned.apk
+            app/build/outputs/apk/release/*.apk
             app/build/test-results/
             app/build/reports/
           if-no-files-found: warn

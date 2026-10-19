@@ -231,12 +231,19 @@ public final class FeatureIntegration {
             // The system camera handles capture; WolFox receives only the user's returned preview.
             activity.startActivityForResult(intent, CAMERA_CAPTURE_REQUEST);
         } catch (Exception error) {
+            TextView currentStatus = cameraStatus.get();
+            if (currentStatus != null) currentStatus.setText("تعذر فتح كاميرا النظام؛ تحقق من توفر تطبيق كاميرا");
             Toast.makeText(activity, "تعذر فتح كاميرا النظام", Toast.LENGTH_SHORT).show();
         }
     }
 
     public static void onImageSelected(int requestCode, int resultCode, Intent data) {
-        if (resultCode != Activity.RESULT_OK || data == null) return;
+        if (resultCode != Activity.RESULT_OK) return;
+        if (data == null) {
+            TextView status = cameraStatus.get();
+            if (status != null) status.setText("لم تُرجع الكاميرا صورة للمعاينة");
+            return;
+        }
         if (requestCode == IMAGE_PICK_REQUEST) {
             selectedImage = data.getData();
             capturedThumbnail = null;
@@ -327,7 +334,10 @@ public final class FeatureIntegration {
         stopScan();
         synchronized (DISCOVERED_LOCK) { discovered.clear(); }
         results.setText("جارٍ التحضير للمسح…");
-        if (!checkBluetoothPermissions(activity, status)) return;
+        if (!checkBluetoothPermissions(activity, status)) {
+            results.setText("لم يبدأ المسح؛ راجع حالة الأذونات أعلاه");
+            return;
+        }
 
         BluetoothAdapter adapter = bluetoothAdapter(activity);
         if (adapter == null) {

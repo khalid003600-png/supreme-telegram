@@ -1,13 +1,8 @@
-// =====================================================
-//  WolFox GPS Module — build.gradle (app)
-// =====================================================
-
+// WolFox GPS Module — independent variant
 plugins { id 'com.android.application' }
-
 android {
     namespace 'com.wolfox.gps'
     compileSdk 34
-
     defaultConfig {
         minSdk 21
         targetSdk 34
@@ -15,28 +10,19 @@ android {
         versionCode 313
         versionName "3.1.1"
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
-    packaging {
-        jniLibs.useLegacyPackaging = false
-    }
-
+    packaging { jniLibs.useLegacyPackaging = false }
     buildTypes {
         release {
             minifyEnabled true
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        debug {
-            minifyEnabled false
-            debuggable true
-        }
+        debug { minifyEnabled false; debuggable true }
     }
-
     testOptions {
         unitTests.includeAndroidResources = true
         unitTests.all {
@@ -45,9 +31,7 @@ android {
         }
     }
 }
-
 dependencies {
-    // API references only: runtime implementation must be supplied by the authorized host framework.
     compileOnly files('libs/xposed-api-82.jar')
     testImplementation files('libs/xposed-api-82.jar')
     testImplementation 'junit:junit:4.13.2'

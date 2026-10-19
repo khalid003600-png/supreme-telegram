@@ -20,16 +20,16 @@ import com.wolfox.gps.util.WFTheme;
 
 /** Shared design tokens and controls for WolFox's Arabic interfaces. */
 public final class WFDesign {
-    public static final int BACKGROUND = 0xFF0B1220;
-    public static final int SURFACE = 0xFF111C2E;
-    public static final int SURFACE_RAISED = 0xFF1A2A40;
-    public static final int PRIMARY = 0xFF2563EB;
-    public static final int TEXT = 0xFFF1F5F9;
-    public static final int MUTED = 0xFF94A3B8;
-    public static final int SUCCESS = 0xFF22C55E;
-    public static final int DANGER = 0xFFDC2626;
+    public static final int BACKGROUND = 0xFF0B1017;
+    public static final int SURFACE = 0xFF171F2C;
+    public static final int SURFACE_RAISED = 0xFF222C3C;
+    public static final int PRIMARY = 0xFF3EB7E7;
+    public static final int TEXT = 0xFFF6F8FC;
+    public static final int MUTED = 0xFFD0D9E9;
+    public static final int SUCCESS = 0xFF38CF8E;
+    public static final int DANGER = 0xFFFA565F;
     public static final int ACCENT = 0xFFF59E0B;
-    public static final int BORDER = 0xFF334B68;
+    public static final int BORDER = 0xFF2A3546;
 
     // Bright supporting actions use dark text; destructive actions retain light text.
     public static final int BUTTON_SELECT = 0xFF34D399;
@@ -140,8 +140,15 @@ public final class WFDesign {
         return normalized.toString().trim();
     }
 
+    /** Graphite/cyan iOS reference: neutral actions, red stop/delete controls. */
+    public static int referenceActionColor(String label, int fallback) {
+        String value = normalizedLabel(label == null ? "" : label);
+        if (value.contains("ايقاف") || value.contains("حذف") || value.contains("تزييف")) return BUTTON_STOP;
+        return SURFACE_RAISED;
+    }
+
     public static void colorButton(Button button, String label, int fallback, int foreground) {
-        int background = semanticColor(label, fallback);
+        int background = referenceActionColor(label, fallback);
         int activeText = isSemanticLabel(label) || contrast(foreground, background) < 4.5d
                 ? readableTextColor(background) : foreground;
         button.setTextColor(new ColorStateList(new int[][] {
@@ -153,7 +160,7 @@ public final class WFDesign {
 
     /** Filled edit/delete icons use the same colors and feedback as the text buttons. */
     public static void colorIconButton(ImageButton button, String label, int fallback) {
-        int background = semanticColor(label, fallback);
+        int background = referenceActionColor(label, fallback);
         button.setImageTintList(new ColorStateList(new int[][] {
                 new int[] {-android.R.attr.state_enabled}, new int[] {}
         }, new int[] {MUTED, readableTextColor(background)}));

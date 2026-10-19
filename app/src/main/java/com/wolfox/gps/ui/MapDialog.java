@@ -180,11 +180,11 @@ public final class MapDialog {
         header.addView(title, new LinearLayout.LayoutParams(
                 0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
-        final String[] mapTypes = {"roadmap", "satellite"};
+        final String[] mapTypes = {"satellite", "hybrid"};
         final Spinner spinner = new Spinner(activity);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(activity,
                 android.R.layout.simple_spinner_item,
-                new String[]{"مخطط", "قمر صناعي"}) {
+                new String[]{"قمر صناعي", "مختلط"}) {
             @Override public View getView(int position, View view, ViewGroup parent) {
                 View value = super.getView(position, view, parent);
                 WFTheme.applyTree(value);
@@ -482,7 +482,7 @@ public final class MapDialog {
     /** Builds the local WebView source URL without rounding model coordinates. */
     static String mapSourceUrl(double latitude, double longitude, String type,
                                boolean preview, boolean readOnly) {
-        String safeType = "satellite".equals(type) ? "satellite" : "roadmap";
+        String safeType = "hybrid".equals(type) ? "hybrid" : "satellite";
         return "https://app.local/map.html?lat=" + Double.toString(latitude)
                 + "&lng=" + Double.toString(longitude) + "&type=" + safeType
                 + (preview ? "&preview=1" : "")

@@ -107,7 +107,7 @@ public class ButtonRoleColorsRegressionTest {
     @Test public void semanticButtons_haveDistinctReadableForegroundsInEnabledAndDisabledStates() {
         Context context = RuntimeEnvironment.getApplication();
         for (Role role : CORE_ROLES) {
-            int semanticBackground = semantic(role.label);
+            int semanticBackground = WFDesign.referenceActionColor(role.label, FALLBACK_SURFACE);
             Button button = WFDesign.button(context, role.label, FALLBACK_SURFACE, Color.WHITE);
 
             button.setEnabled(true);
@@ -117,7 +117,7 @@ public class ButtonRoleColorsRegressionTest {
             assertContrast("Enabled text for " + role.name, button.getCurrentTextColor(),
                     semanticBackground);
 
-            if (requiresDarkForeground(role.label)) {
+            if (luminance(semanticBackground) > 0.5) {
                 assertTrue(role.name + " uses a light semantic surface and needs dark text",
                         luminance(button.getCurrentTextColor()) < luminance(semanticBackground));
             }

@@ -149,7 +149,12 @@ public final class BeaconTools {
             AdvertiseCallback previous = callback;
             callback = null;
             if (advertiser != null && previous != null) {
-                try { advertiser.stopAdvertising(previous); } catch (RuntimeException ignored) { }
+                try {
+                    if (Build.VERSION.SDK_INT < 31 || activity.checkSelfPermission(Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED) {
+                        advertiser.stopAdvertising(previous);
+                    }
+                } catch (SecurityException ignored) { }
+                catch (RuntimeException ignored) { }
             }
             advertiser = null;
             startButton.setEnabled(true);

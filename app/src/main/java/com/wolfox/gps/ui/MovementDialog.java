@@ -25,10 +25,23 @@ public final class MovementDialog {
             distance.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
             distance.setHint("مسافة الخطوة بالمتر"); distance.setText("10"); root.addView(distance);
             String[] labels = {"شمال", "شرق", "جنوب", "غرب"};
+            LinearLayout directions = new LinearLayout(activity);
+            directions.setOrientation(LinearLayout.VERTICAL);
+            root.addView(directions);
+            LinearLayout directionRow = null;
             for (int i = 0; i < labels.length; i++) {
+                if (i % 2 == 0) {
+                    directionRow = new LinearLayout(activity);
+                    directionRow.setOrientation(LinearLayout.HORIZONTAL);
+                    directions.addView(directionRow);
+                }
                 final int bearing = i * 90;
                 Button move = WFDesign.button(activity, labels[i], WFDesign.SURFACE_RAISED, WFDesign.TEXT);
-                root.addView(move);
+                LinearLayout.LayoutParams moveParams = new LinearLayout.LayoutParams(0,
+                        android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+                int gap = (int) (6 * activity.getResources().getDisplayMetrics().density + 0.5f);
+                moveParams.setMargins(gap, gap, gap, gap);
+                directionRow.addView(move, moveParams);
                 move.setOnClickListener(v -> SafeUi.run(activity, "تحريك الموقع", () -> {
                     double meters;
                     try { meters = Double.parseDouble(distance.getText().toString()); }

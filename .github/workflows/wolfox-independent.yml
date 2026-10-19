@@ -44,14 +44,17 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          gradle --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleDebug 2>&1 | tee build.log
-      - name: Verify APK
+          gradle --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleRelease 2>&1 | tee build.log
+      - name: Verify unsigned release APK
         shell: bash
         run: |
           set -euo pipefail
-          APK=app/build/outputs/apk/debug/app-debug.apk
+          APK=app/build/outputs/apk/release/app-release-unsigned.apk
           test -s "$APK"
-          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose "$APK"
+          if "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify "$APK"; then
+            echo "Expected unsigned APK but found signed artifact" >&2
+            exit 1
+          fi
           sha256sum "$APK" > apk-sha256.txt
       - uses: actions/upload-artifact@v4
         if: always()
@@ -65,8 +68,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: wolfox-signed-debug-apk
+          name: wolfox-unsigned-release-apk
           path: |
-            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/release/*unsigned.apk
             apk-sha256.txt
           if-no-files-found: error

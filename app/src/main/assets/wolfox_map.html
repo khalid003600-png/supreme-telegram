@@ -70,7 +70,7 @@
     if (spoof) document.body.classList.add('spoof');
     var selectedLat = clampLat(parseFloat(params.get('lat')) || 24.7136);
     var selectedLng = wrapLng(parseFloat(params.get('lng')) || 46.6753);
-    var mapType = params.get('type') === 'satellite' ? 'satellite' : 'roadmap';
+    var mapType = params.get('type') === 'hybrid' ? 'hybrid' : 'satellite';
     var zoom = preview ? 13 : 14;
     var tileSize = 256;
     var map = document.getElementById('map');
@@ -110,17 +110,15 @@
     }
 
     function tileLayers(z, x, y) {
-      if (mapType === 'satellite') {
-        return [[
-          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' + z + '/' + y + '/' + x,
-          'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' + z + '/' + y + '/' + x
-        ]];
-      }
-      return [[
-        'https://tile.openstreetmap.org/' + z + '/' + x + '/' + y + '.png',
-        'https://a.tile.openstreetmap.org/' + z + '/' + x + '/' + y + '.png',
-        'https://basemaps.cartocdn.com/light_all/' + z + '/' + x + '/' + y + '.png'
-      ]];
+      var imagery = [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' + z + '/' + y + '/' + x,
+        'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/' + z + '/' + y + '/' + x
+      ];
+      var layers = [imagery];
+      if (mapType === 'hybrid') layers.push([
+        'https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/' + z + '/' + y + '/' + x
+      ]);
+      return layers;
     }
 
     function updateCoords() {
@@ -370,7 +368,7 @@
       render();
     };
     window.setMapType = function (type) {
-      if (['roadmap','satellite'].indexOf(type) < 0) return;
+      if (['satellite','hybrid'].indexOf(type) < 0) return;
       mapType = type;
       firstTileLoaded = false;
       showStatus('جاري تحميل الخريطة…', 0);

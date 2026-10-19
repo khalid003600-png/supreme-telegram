@@ -1,0 +1,8 @@
+{
+  "edition": "gps-upload-identifier",
+  "application_id": "com.wolfox.gps.edition.gps.media.identifier",
+  "ios_repository": "khalid003600-png/H",
+  "ios_branch": "sandbox/wolfox-variant-gps-upload-identifier-20261019",
+  "ios_commit": "5ea66352420ad6569ee7c385fb1b5ff8209df5f2",
+  "android_base_commit": "f1a4b3495585373f7bd80552870a3f17feb27539"
+}

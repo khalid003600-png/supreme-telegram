@@ -84,7 +84,7 @@ public class SelectedLocationStateTest {
         assertEquals(Double.doubleToRawLongBits(0d),
                 Double.doubleToRawLongBits(reloaded.getLongitude()));
         assertEquals("نقطة الأصل", reloaded.getLabel());
-        assertEquals("https://app.local/map.html?lat=0.0&lng=0.0&type=roadmap&preview=1&readonly=1",
+        assertEquals("https://app.local/map.html?lat=0.0&lng=0.0&type=satellite&preview=1&readonly=1",
                 MapDialog.mapSourceUrl(reloaded.getLatitude(), reloaded.getLongitude(), "roadmap",
                         true, true));
     }

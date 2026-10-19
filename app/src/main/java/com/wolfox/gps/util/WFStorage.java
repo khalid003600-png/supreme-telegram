@@ -215,7 +215,8 @@ public class WFStorage {
     }
 
     public String getMapType() {
-        return prefs.getString(KEY_MAP_TYPE, "roadmap");
+        String type = prefs.getString(KEY_MAP_TYPE, "satellite");
+        return "hybrid".equals(type) ? "hybrid" : "satellite";
     }
 
     // ─── حالة الترخيص ─────────────────────────────────────────────────────────

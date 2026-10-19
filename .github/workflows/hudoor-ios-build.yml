@@ -1,0 +1,61 @@
+name: Hudoor iOS Build
+
+on:
+  push:
+    branches: [hudoor-ios-build]
+    paths:
+      - 'Hudoor/ios/**'
+      - '.github/workflows/hudoor-ios-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-ios:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Show Xcode version
+        run: xcodebuild -version
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: |
+          cd Hudoor/ios
+          xcodegen generate
+      - name: Build real iOS arm64 app (unsigned)
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project Hudoor/ios/Hudoor.xcodeproj \
+            -scheme Hudoor \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$GITHUB_WORKSPACE/derived" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+      - name: Package unsigned IPA and verify binary
+        run: |
+          set -euo pipefail
+          APP="$GITHUB_WORKSPACE/derived/Build/Products/Release-iphoneos/Hudoor.app"
+          test -d "$APP"
+          test -f "$APP/Hudoor"
+          file "$APP/Hudoor"
+          mkdir -p "$GITHUB_WORKSPACE/dist/Payload"
+          ditto "$APP" "$GITHUB_WORKSPACE/dist/Payload/Hudoor.app"
+          cd "$GITHUB_WORKSPACE/dist"
+          zip -qyr Hudoor-unsigned.ipa Payload
+          unzip -t Hudoor-unsigned.ipa | tail -1
+          shasum -a 256 Hudoor-unsigned.ipa > Hudoor-unsigned.sha256
+      - name: Upload unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hudoor-iOS-unsigned
+          path: |
+            dist/Hudoor-unsigned.ipa
+            dist/Hudoor-unsigned.sha256
+          if-no-files-found: error

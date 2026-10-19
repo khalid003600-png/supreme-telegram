@@ -207,6 +207,7 @@ public class SettingsDialog {
         addSpacing(root, activity, 12);
 
         // تُعرض بيانات الاشتراك في شاشة مستقلة عن إعدادات الموقع والأيقونة.
+        if (com.wolfox.gps.manager.LicenseManager.getInstance().isActive(activity)) {
         root.addView(buildSectionLabel(activity, "إدارة الاشتراك"));
         TextView subscriptionHint = new TextView(activity);
         subscriptionHint.setText(storage.getLicenseSummaryText());
@@ -223,6 +224,7 @@ public class SettingsDialog {
             SubscriptionDialog.show(activity);
         });
         root.addView(openSubscription);
+        }
 
         // Saved locations are managed exclusively from the Favorites section.
 
@@ -248,9 +250,14 @@ public class SettingsDialog {
                 WFLocation loc = GPSMockManager.getInstance().getLocation();
                 if (loc != null) {
                     loc.setAltitude(alt);
-                    GPSMockManager.getInstance().setLocation(loc);
                 }
             } catch (Exception ignored) {}
+            WFLocation savedLocation = GPSMockManager.getInstance().getLocation();
+            if (savedLocation != null && savedLocation.isValid()) {
+                savedLocation.setAccuracy(Math.max(1, accuracyBar.getProgress()));
+                savedLocation.setSpeed(speedBar.getProgress());
+                GPSMockManager.getInstance().setLocation(savedLocation);
+            }
             FloatingManager.getInstance().refreshAppearance();
             Toast.makeText(activity, "✅ تم الحفظ", Toast.LENGTH_SHORT).show();
             dialog.dismiss();

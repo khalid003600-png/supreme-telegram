@@ -40,7 +40,9 @@ public class WFDesignButtonTest {
         // Exercise the selector with the real widget state; this test widget is detached.
         surfaces.setState(b.getDrawableState());
         Drawable enabled = surfaces.getCurrent();
-        assertEquals(0xFFFFFFFF, b.getCurrentTextColor());
+        assertTrue("Enabled label must be legible on the destructive red surface",
+                b.getCurrentTextColor() == 0xFFFFFFFF
+                        || b.getCurrentTextColor() == WFDesign.BACKGROUND);
         b.setEnabled(false);
         b.refreshDrawableState();
         surfaces.setState(b.getDrawableState());

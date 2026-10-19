@@ -43,7 +43,9 @@ jobs:
             verify_safe_favorites_map.py \
             verify_merged_runtime.py \
             verify_explicit_visibility.py \
-            verify_embedded_hosts.py; do
+            verify_embedded_hosts.py \
+            verify_design_palette.py \
+            verify_safe_device_tools.py; do
             python3 "tests/$check"
           done
           export WOLFOX_UNSIGNED_ONLY=1

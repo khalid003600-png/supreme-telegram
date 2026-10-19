@@ -101,7 +101,7 @@ public final class MapDialog {
         Button expandButton = buildButton(activity, WFTheme.icon("⛶") + "  توسيع", BG);
         expandButton.setOnClickListener(expand);
         FrameLayout.LayoutParams expandLp = new FrameLayout.LayoutParams(
-                dp(activity, 92), dp(activity, 38), Gravity.TOP | Gravity.START);
+                dp(activity, 92), dp(activity, 48), Gravity.TOP | Gravity.START);
         expandLp.setMargins(dp(activity, 8), dp(activity, 8), 0, 0);
         root.addView(expandButton, expandLp);
 
@@ -210,7 +210,7 @@ public final class MapDialog {
             dialog.dismiss();
             if (!favoriteViewOnly) WolFoxPanel.show(activity);
         });
-        header.addView(close, new LinearLayout.LayoutParams(dp(activity, 44), dp(activity, 44)));
+        header.addView(close, new LinearLayout.LayoutParams(dp(activity, 48), dp(activity, 48)));
         root.addView(header);
 
         final WebView webView = new WebView(activity);

@@ -40,7 +40,9 @@ public final class WFDesign {
     public static final int BUTTON_SAVE = 0xFF7C3AED;
     public static final int BUTTON_COPY = 0xFF4338CA;
     public static final int BUTTON_MAP = 0xFF2DD4BF;
-    public static final int BUTTON_LOCATION = 0xFF0369A1;
+    public static final int BUTTON_LOCATION = 0xFF34D399;
+    public static final int BUTTON_BLUETOOTH = 0xFF0E7490;
+    public static final int BUTTON_CAMERA = 0xFF7C3AED;
     public static final int BUTTON_FAVORITE = 0xFFFBBF24;
     public static final int BUTTON_SUBSCRIPTION = 0xFFA21CAF;
     public static final int BUTTON_SETTINGS = 0xFF475569;
@@ -99,6 +101,8 @@ public final class WFDesign {
         if (value.contains("اغلاق") || value.contains("خروج") || value.contains("الغاء")) return BUTTON_CLOSE;
         if (value.contains("ايقاف")) return BUTTON_STOP;
         if (value.contains("تزييف")) return DANGER;
+        if (value.contains("بلوتوث") || value.contains("bluetooth") || value.contains("BLE")) return BUTTON_BLUETOOTH;
+        if (value.contains("كاميرا") || value.contains("اختيار صورة")) return BUTTON_CAMERA;
         if (value.contains("لصق")) return BUTTON_PASTE;
         if (value.contains("حذف") || value.contains("مسح الكل")) return BUTTON_DELETE;
         if (value.contains("مسح")) return BUTTON_CLEAR;

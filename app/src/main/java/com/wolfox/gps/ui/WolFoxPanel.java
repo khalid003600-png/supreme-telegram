@@ -180,12 +180,11 @@ public final class WolFoxPanel {
                 }),
                 action(activity, WFTheme.icon("⌖") + "  موقعي", v -> useDeviceLocation(activity, dialog))));
 
-        root.addView(row(activity,
-                action(activity, "المفضلة والمواقع المحفوظة", v -> {
-                    dialog.dismiss();
-                    FavoritesDialog.show(activity);
-                }),
-                action(activity, "حفظ الموقع الحالي", v -> saveCurrentLocation(activity))));
+        // All saved-location operations live in Favorites; avoid a duplicate save button.
+        root.addView(action(activity, "المفضلة والمواقع المحفوظة", v -> {
+            dialog.dismiss();
+            FavoritesDialog.show(activity);
+        }));
 
         root.addView(action(activity, "الإعدادات والاشتراك", v -> {
             dialog.dismiss();
@@ -323,10 +322,10 @@ public final class WolFoxPanel {
     private static LinearLayout row(Context context, Button left, Button right) {
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(LinearLayout.HORIZONTAL);
-        row.addView(left, weighted(context, 44, 6));
+        row.addView(left, weighted(context, 44, 10));
         row.addView(right, weighted(context, 44, 0));
         LinearLayout.LayoutParams params = fullWrap();
-        params.setMargins(0, 0, 0, dp(context, 6));
+        params.setMargins(0, 0, 0, dp(context, 10));
         row.setLayoutParams(params);
         return row;
     }

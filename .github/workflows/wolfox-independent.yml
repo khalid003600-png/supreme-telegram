@@ -55,11 +55,18 @@ jobs:
             echo "Legacy K7 references remain" >&2
             exit 1
           fi
-      - name: Compile, test, and assemble
+      - name: Run unit tests and preserve failure report
+        id: tests
+        continue-on-error: true
         shell: bash
         run: |
           set -o pipefail
-          gradle --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleRelease 2>&1 | tee build.log
+          gradle --no-daemon --stacktrace :app:testDebugUnitTest 2>&1 | tee build.log
+      - name: Assemble unsigned release APK independently
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle --no-daemon --stacktrace :app:assembleRelease 2>&1 | tee -a build.log
       - name: Verify unsigned release APK
         shell: bash
         run: |
@@ -88,3 +95,8 @@ jobs:
             app/build/outputs/apk/release/*unsigned.apk
             apk-sha256.txt
           if-no-files-found: error
+      - name: Enforce unit-test result after uploading APK
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "::error::Unit tests failed. Unsigned APK is available for diagnosis, but build validation is FAILED."
+          exit 1

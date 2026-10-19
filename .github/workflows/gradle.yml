@@ -31,9 +31,9 @@ jobs:
       contents: write
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@b843ebf1fcdcf0eafdd153c2108f8645896b4540 # v4
       with:
         java-version: '17'
         distribution: 'temurin'

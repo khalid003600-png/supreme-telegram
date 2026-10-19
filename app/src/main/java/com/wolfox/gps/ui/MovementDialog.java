@@ -50,6 +50,12 @@ public final class MovementDialog {
                     status.setText("تم تحريك الموقع المحدد؛ حالة تشغيل المحاكاة لم تتغير");
                 }));
             }
+            Button jitter = WFDesign.button(activity, "ذبذبة خفيفة (حتى 2 متر)", WFDesign.BUTTON_LOCATION, WFDesign.TEXT);
+            root.addView(jitter);
+            jitter.setOnClickListener(v -> stepRandom(activity, status, 2d));
+            Button randomWalk = WFDesign.button(activity, "مشي عشوائي — خطوة 10 أمتار", WFDesign.BUTTON_SELECT, WFDesign.TEXT);
+            root.addView(randomWalk);
+            randomWalk.setOnClickListener(v -> stepRandom(activity, status, 10d));
             Button settings = WFDesign.button(activity, "إعدادات السرعة والدقة", WFDesign.SURFACE_RAISED, WFDesign.TEXT);
             root.addView(settings);
             WFTheme.applyTree(root);
@@ -57,6 +63,37 @@ public final class MovementDialog {
                     .setView(root).setNegativeButton("إغلاق", null).show();
             settings.setOnClickListener(v -> SafeUi.run(activity, "فتح الإعدادات", () -> { dialog.dismiss(); SettingsDialog.show(activity); }));
             WFDesign.styleAlertDialog(dialog);
+        });
+    }
+
+    /** One user-initiated bounded step; does not start background movement. */
+    private static void stepRandom(Activity activity, TextView status, double maxMeters) {
+        SafeUi.run(activity, "حركة عشوائية", () -> {
+            GPSMockManager manager = GPSMockManager.getInstance();
+            WFLocation old = manager.getLocation();
+            if (old == null || !old.isValid()) {
+                status.setText("حدد موقعًا أولًا");
+                return;
+            }
+            double meters = maxMeters == 10d ? 10d : 0.5d + Math.random() * 1.5d;
+            double bearing = Math.random() * 360d;
+            double lat = Math.toRadians(old.getLatitude());
+            double lng = Math.toRadians(old.getLongitude());
+            double angle = meters / 6371000d;
+            double direction = Math.toRadians(bearing);
+            double nextLat = Math.asin(Math.sin(lat) * Math.cos(angle)
+                    + Math.cos(lat) * Math.sin(angle) * Math.cos(direction));
+            double nextLng = lng + Math.atan2(Math.sin(direction) * Math.sin(angle) * Math.cos(lat),
+                    Math.cos(angle) - Math.sin(lat) * Math.sin(nextLat));
+            WFLocation next = new WFLocation(Math.toDegrees(nextLat),
+                    (Math.toDegrees(nextLng) + 540d) % 360d - 180d);
+            next.setAccuracy(old.getAccuracy());
+            next.setAltitude(old.getAltitude());
+            next.setSpeed(old.getSpeed());
+            next.setBearing((float) bearing);
+            manager.setLocation(next);
+            status.setText(maxMeters == 10d ? "تم تنفيذ خطوة مشي عشوائية 10 أمتار"
+                    : "تم تطبيق ذبذبة خفيفة حتى مترين");
         });
     }
 }

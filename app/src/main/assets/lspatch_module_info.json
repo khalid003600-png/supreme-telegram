@@ -1,0 +1,10 @@
+{
+  "id": "com.wolfox.gps",
+  "name": "WolFox GPS Module",
+  "version": "3.1.1",
+  "versionCode": 313,
+  "description": "WolFox GPS licensed module for the authorized host — LSPatch and LSPosed",
+  "author": "WolFox",
+  "minApi": 21,
+  "scope": ["sa.alfursan.it.apps.ontimeplus"]
+}

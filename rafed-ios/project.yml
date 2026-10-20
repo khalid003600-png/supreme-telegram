@@ -1,0 +1,30 @@
+name: Rafed
+options:
+  bundleIdPrefix: app.lilac7003
+settings:
+  base:
+    IPHONEOS_DEPLOYMENT_TARGET: "15.0"
+    SWIFT_VERSION: "5.0"
+    PRODUCT_BUNDLE_IDENTIFIER: app.lilac7003.mint3477
+targets:
+  Rafed:
+    type: application
+    platform: iOS
+    sources: [Sources, Assets.xcassets]
+    preBuildScripts:
+      - name: Decode app icon
+        script: 'base64 --decode -i "$SRCROOT/AppIcon.png.base64" > "$SRCROOT/Assets.xcassets/AppIcon.appiconset/AppIcon.png"'
+        basedOnDependencyAnalysis: false
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: رافد
+        NSLocationWhenInUseUsageDescription: "يستخدم رافد موقعك عند طلبه من الموقع وبعد موافقتك لتقديم الخدمات المرتبطة بالموقع."
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGNING_ALLOWED: NO
+    scheme: {}

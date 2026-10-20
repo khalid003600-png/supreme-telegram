@@ -153,7 +153,7 @@ public class FeatureIntegrationImagePreviewTest {
 
     private ImageView findPreview(View view) {
         if (view instanceof ImageView
-                && PREVIEW_DESCRIPTION.contentEquals(view.getContentDescription())) {
+                && PREVIEW_DESCRIPTION.equals(view.getContentDescription())) {
             return (ImageView) view;
         }
         if (view instanceof ViewGroup) {

@@ -207,6 +207,7 @@ public class UiAuditdialogsLayoutTest {
     }
 
     private void collectButtons(View view, List<Button> buttons) {
+        if (view.getVisibility() != View.VISIBLE) return;
         if (view instanceof Button) buttons.add((Button) view);
         if (view instanceof ViewGroup) {
             ViewGroup group = (ViewGroup) view;

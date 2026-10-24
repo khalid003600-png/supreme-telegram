@@ -34,6 +34,14 @@ jobs:
         run: |
           set -euo pipefail
           bash -n build-local.sh
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('app/src/main/AndroidManifest.xml').getroot()
+          permissions = [node.attrib.get('{http://schemas.android.com/apk/res/android}name', '') for node in root.findall('uses-permission')]
+          forbidden = [p for p in permissions if 'BLUETOOTH' in p]
+          assert not forbidden, f'GPS-only manifest still requests Bluetooth permissions: {forbidden}'
+          print('PASS: manifest XML valid and Bluetooth permissions absent')
+          PY
           for check in \
             verify_build_consistency.py \
             verify_icon_lifecycle_fix.py \

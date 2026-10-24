@@ -25,6 +25,7 @@ jobs:
           echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
           SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -1)"
           test -x "$SDKMANAGER"
+          test -f app/libs/xposed-api-82.jar
           set +o pipefail
           yes | "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null
           set -o pipefail
@@ -59,6 +60,9 @@ jobs:
           bash build-local.sh
           APK=build/local/apk/WolFox_GPS_Module_v3.1.1_UNSIGNED_ALIGNED.apk
           test -s "$APK"
+          test -x "$ANDROID_HOME/build-tools/34.0.0/aapt"
+          test -x "$ANDROID_HOME/build-tools/34.0.0/zipalign"
+          test -x "$ANDROID_HOME/build-tools/34.0.0/apksigner"
           "$ANDROID_HOME/build-tools/34.0.0/zipalign" -c 4 "$APK"
           "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.wolfox.gps.variant5' versionCode='313' versionName='3.1.1'"
           if "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify "$APK"; then

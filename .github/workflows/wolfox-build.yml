@@ -2,7 +2,9 @@ name: WolFox source build and verification
 on:
   workflow_dispatch:
   push:
-    branches: [wolfox-current-structure-build]
+    branches:
+      - wolfox-current-structure-build
+      - gps-only-build-fix-20261024
 permissions:
   contents: read
 jobs:
@@ -25,12 +27,16 @@ jobs:
         run: |
           set -euo pipefail
           export ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
-          yes | sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null || true
+          set +o pipefail
+          yes | sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null
+          set -o pipefail
           sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --install "cmdline-tools;latest" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          test -s "$ANDROID_SDK_ROOT/platforms/android-34/android.jar"
       - name: Verify source and static checks
+        shell: bash
         run: |
           set -euo pipefail
-          grep -F "applicationId 'com.wolfox.gps'" app/build.gradle
+          grep -F "applicationId 'com.wolfox.gps.edition.gps'" app/build.gradle
           test -s gradle/wrapper/gradle-wrapper.jar
           test -f app/src/main/java/com/wolfox/gps/manager/FloatingManager.java
           test -f app/src/main/java/com/wolfox/gps/manager/GPSMockManager.java
@@ -51,7 +57,8 @@ jobs:
           set -euo pipefail
           APK=app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
-          "${ANDROID_HOME}/build-tools/34.0.0/apksigner" verify --verbose "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -c 4 "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose "$APK"
           sha256sum "$APK" > apk-sha256.txt
       - name: Upload build logs and test reports even on failure
         uses: actions/upload-artifact@a54395f606b9bdc305651aa0e009abae2055f445

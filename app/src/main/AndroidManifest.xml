@@ -6,13 +6,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
-    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
-
     <application
         android:allowBackup="false"
         android:fullBackupContent="false"
@@ -20,7 +13,7 @@
         android:usesCleartextTraffic="false"
         android:hasCode="true"
         android:icon="@drawable/wolfox_module_icon"
-        android:label="WolFox GPS 3"
+        android:label="WolFox GPS"
         android:supportsRtl="true"
         tools:targetApi="s"
         android:theme="@android:style/Theme.Material.NoActionBar">
@@ -28,7 +21,7 @@
         <meta-data android:name="xposedmodule" android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="WolFox GPS 3.1.1 — extended provider compatibility for LSPatch and LSPosed" />
+            android:value="WolFox GPS 3.1.1 — GPS-only edition" />
         <meta-data android:name="xposedminversion" android:value="93" />
     </application>
 </manifest>

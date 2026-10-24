@@ -1,87 +1,75 @@
-name: WolFox GPS-only clean build and verification
+name: WolFox source build and verification
 on:
-  push:
-    branches: [gps-only-clean-no-test-data-20261024]
   workflow_dispatch:
+  push:
+    branches: [wolfox-current-structure-build]
 permissions:
   contents: read
 jobs:
-  android:
+  build:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-java@b843ebf23cecebc4e3f86bad33dc2e531e896fb5
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install Android SDK
-        shell: bash
-        run: |
-          set -euo pipefail
-          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
-          export ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
-          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
-          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -1)"
-          test -x "$SDKMANAGER"
-          test -f app/libs/xposed-api-82.jar
-          set +o pipefail
-          yes | "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null
-          set -o pipefail
-          "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" --install 'platforms;android-34' 'build-tools;34.0.0'
-      - name: Build and verify unsigned APK
-        shell: bash
-        run: |
-          set -euo pipefail
-          bash -n build-local.sh
-          python3 - <<'PY'
-          import xml.etree.ElementTree as ET
-          root = ET.parse('app/src/main/AndroidManifest.xml').getroot()
-          permissions = [node.attrib.get('{http://schemas.android.com/apk/res/android}name', '') for node in root.findall('uses-permission')]
-          forbidden = [p for p in permissions if 'BLUETOOTH' in p]
-          assert not forbidden, f'GPS-only manifest still requests Bluetooth permissions: {forbidden}'
-          print('PASS: manifest XML valid and Bluetooth permissions absent')
-          PY
-          for check in \
-            verify_build_consistency.py \
-            verify_icon_lifecycle_fix.py \
-            verify_license_expiry_enforcement.py \
-            verify_no_root_dependency.py \
-            verify_provider_compatibility.py \
-            verify_safe_favorites_map.py \
-            verify_merged_runtime.py \
-            verify_explicit_visibility.py \
-            verify_embedded_hosts.py \
-            verify_design_palette.py; do
-            python3 "tests/$check"
-          done
-          export WOLFOX_UNSIGNED_ONLY=1
-          bash build-local.sh
-          APK=build/local/apk/WolFox_GPS_Module_v3.1.1_UNSIGNED_ALIGNED.apk
-          test -s "$APK"
-          test -x "$ANDROID_HOME/build-tools/34.0.0/aapt"
-          test -x "$ANDROID_HOME/build-tools/34.0.0/zipalign"
-          test -x "$ANDROID_HOME/build-tools/34.0.0/apksigner"
-          "$ANDROID_HOME/build-tools/34.0.0/zipalign" -c 4 "$APK"
-          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.wolfox.gps.variant5' versionCode='313' versionName='3.1.1'"
-          if "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify "$APK"; then
-            echo 'Expected an unsigned APK, but apksigner verified a signature.' >&2
-            exit 1
-          fi
-          python3 - "$APK" <<'PY'
-          import sys, zipfile
-          with zipfile.ZipFile(sys.argv[1]) as apk:
-              assert apk.testzip() is None
-              signatures = [n for n in apk.namelist() if n.upper().startswith('META-INF/') and n.upper().endswith(('.RSA', '.DSA', '.EC'))]
-              assert not signatures, f'unexpected signature files: {signatures}'
-          PY
-          sha256sum "$APK" | tee apk-sha256.txt
-      - name: Upload unsigned APK
-        uses: actions/upload-artifact@v4
+      - uses: android-actions/setup-android@d7329e7d5e2ea5f1866b7523dbe0bec99acf856c
+      - uses: gradle/actions/setup-gradle@489f7e12493e4dd5b1602ade5f3a942fc7d2a7f3
         with:
-          name: wolfox-gps-variant5-unsigned-apk
+          gradle-version: '8.9'
+          cache-disabled: true
+      - name: Install Android requirements
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
+          yes | sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null || true
+          sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --install "cmdline-tools;latest" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+      - name: Verify source and static checks
+        run: |
+          set -euo pipefail
+          grep -F "applicationId 'com.wolfox.gps'" app/build.gradle
+          test -s gradle/wrapper/gradle-wrapper.jar
+          test -f app/src/main/java/com/wolfox/gps/manager/FloatingManager.java
+          test -f app/src/main/java/com/wolfox/gps/manager/GPSMockManager.java
+          bash tests-linux/check.sh
+      - name: Compile and package APK
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle --no-daemon --stacktrace :app:assembleDebug 2>&1 | tee wolfox-gradle-build.log
+      - name: Run Android unit tests
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle --no-daemon --stacktrace :app:testDebugUnitTest 2>&1 | tee wolfox-gradle-tests.log
+      - name: Verify signed APK and hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          "${ANDROID_HOME}/build-tools/34.0.0/apksigner" verify --verbose "$APK"
+          sha256sum "$APK" > apk-sha256.txt
+      - name: Upload build logs and test reports even on failure
+        uses: actions/upload-artifact@a54395f606b9bdc305651aa0e009abae2055f445
+        if: always()
+        with:
+          name: wolfox-build-diagnostics
           path: |
-            build/local/apk/WolFox_GPS_Module_v3.1.1_UNSIGNED_ALIGNED.apk
+            wolfox-gradle-build.log
+            wolfox-gradle-tests.log
+            app/build/reports/tests/
+            app/build/test-results/
+          if-no-files-found: warn
+      - name: Upload verified APK
+        uses: actions/upload-artifact@a54395f606b9bdc305651aa0e009abae2055f445
+        if: success()
+        with:
+          name: wolfox-debug-apk
+          path: |
+            app/build/outputs/apk/debug/*.apk
             apk-sha256.txt
           if-no-files-found: error

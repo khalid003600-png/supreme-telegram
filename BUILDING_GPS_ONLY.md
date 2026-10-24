@@ -1,32 +1,21 @@
-# WolFox GPS-only — build requirements
+# WolFox GPS-only clean branch
 
-This branch contains a dedicated GitHub Actions workflow for the GPS-only Android edition. The workflow pins third-party Actions to full commit SHAs to comply with this repository's action policy.
+This branch is isolated from the prior build branch. It removes Bluetooth permissions from the Android manifest and labels the module as GPS-only. Repository test scripts are retained as verification tooling; they are not copied into the APK by the local build script.
 
-## Toolchain
+## Build environment
+- GitHub Actions runner: Ubuntu 24.04
+- Java: Temurin 17
+- Android SDK platform 34
+- Android Build Tools 34.0.0
+- Build mode: unsigned APK; no test signing key or release credentials are included
 
-- Ubuntu 24.04 GitHub Actions runner
-- Temurin JDK 17
-- Gradle 8.9 downloaded directly, so the build does not depend on the wrapper's distribution bootstrap
-- Android SDK platform 34 and platform-tools
-- Android Build Tools 34.0.0 (`apksigner`, `zipalign`)
-- Gradle wrapper JAR and properties retained in source
-- `app/libs/xposed-api-82.jar`, used as a compile-only dependency
-
-## Run the build
-
+## Run
 1. Open the repository Actions tab.
-2. Select **WolFox GPS-only build and verification**.
-3. Run it on branch `fix/gps-only-build-prerequisites-20261024`.
-4. Confirm the **Verify APK outputs** step passes.
-5. Download the artifact named `WolFox-GPS-only-APK`.
+2. Choose **WolFox GPS-only clean build and verification**.
+3. Run it on branch `gps-only-clean-no-test-data-20261024`, or push a commit to that branch.
+4. Verify the workflow passes and inspect the artifact before installation.
 
-## Expected outputs
+## Output and limitations
+The current workflow builds `build/local/apk/WolFox_GPS_Module_v3.1.1_UNSIGNED_ALIGNED.apk` and uploads it with a SHA-256 file. It is unsigned and is not a production-signed release.
 
-- `app-debug.apk`: debug APK, verified by `apksigner`.
-- `app-release-unsigned.apk`: unsigned release APK, checked for zip alignment.
-
-A production-signed APK requires a real keystore and signing credentials. Do not commit those credentials to the repository. The unsigned release APK is not a production-signed release.
-
-## Evidence standard
-
-Do not claim the build succeeded unless the verification step passes and the Actions artifact contains non-empty APK files. Unit test/lint failures are reported after artifact upload to preserve outputs for diagnosis.
+Source-level checks and APK packaging checks do not prove that hooks work inside a target app on a physical device. The manifest no longer requests Bluetooth permissions, but a full source-level removal of all Bluetooth implementation/UI code and device-level runtime verification are still separate tasks. Do not describe this branch as a fully runtime-validated release until those checks are completed.

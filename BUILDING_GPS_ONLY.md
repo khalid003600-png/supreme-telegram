@@ -1,12 +1,12 @@
 # WolFox GPS-only — build requirements
 
-This branch contains a dedicated GitHub Actions workflow for the GPS-only Android edition.
+This branch contains a dedicated GitHub Actions workflow for the GPS-only Android edition. The workflow pins third-party Actions to full commit SHAs to comply with this repository's action policy.
 
 ## Toolchain
 
 - Ubuntu 24.04 GitHub Actions runner
 - Temurin JDK 17
-- Gradle 8.9 installed directly by the workflow, so the build does not depend on downloading the Gradle wrapper distribution
+- Gradle 8.9 downloaded directly, so the build does not depend on the wrapper's distribution bootstrap
 - Android SDK platform 34 and platform-tools
 - Android Build Tools 34.0.0 (`apksigner`, `zipalign`)
 - Gradle wrapper JAR and properties retained in source

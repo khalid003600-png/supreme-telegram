@@ -44,8 +44,7 @@ jobs:
             verify_merged_runtime.py \
             verify_explicit_visibility.py \
             verify_embedded_hosts.py \
-            verify_design_palette.py \
-            ; do
+            verify_design_palette.py; do
             python3 "tests/$check"
           done
           export WOLFOX_UNSIGNED_ONLY=1

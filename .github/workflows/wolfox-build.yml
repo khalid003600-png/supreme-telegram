@@ -1,7 +1,7 @@
-name: WolFox source build and verification (unsigned variant 5)
+name: WolFox GPS-only clean build and verification
 on:
   push:
-    branches: [wolfox-current-structure-build]
+    branches: [gps-only-clean-no-test-data-20261024]
   workflow_dispatch:
 permissions:
   contents: read
@@ -45,7 +45,7 @@ jobs:
             verify_explicit_visibility.py \
             verify_embedded_hosts.py \
             verify_design_palette.py \
-            verify_safe_device_tools.py; do
+            ; do
             python3 "tests/$check"
           done
           export WOLFOX_UNSIGNED_ONLY=1

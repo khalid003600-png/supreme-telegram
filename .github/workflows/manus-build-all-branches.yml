@@ -41,10 +41,8 @@ jobs:
           java-version: '17'
           cache: gradle
       - uses: android-actions/setup-android@v3
-      - name: Install Android SDK components
-        run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager --install 'platform-tools' 'platforms;android-35' 'build-tools;35.0.0'
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
       - name: Build debug APK
         shell: bash
         run: |
@@ -55,7 +53,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: supreme-telegram-${{ matrix.safe }}-${{ github.run_number }}
+          name: supreme-telegram-${{ matrix.safe }}-${{ strategy.job-index }}-${{ github.run_number }}
           path: '**/build/outputs/apk/**/*.apk'
           if-no-files-found: error
           retention-days: 30

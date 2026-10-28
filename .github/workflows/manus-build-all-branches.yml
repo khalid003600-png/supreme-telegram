@@ -1,0 +1,61 @@
+name: Build all Android branches (Manus)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/manus-build-all-branches.yml'
+permissions:
+  contents: read
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+    steps:
+      - id: set
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPOSITORY: ${{ github.repository }}
+        run: |
+          branches="$(gh api --paginate "repos/$GH_REPOSITORY/branches?per_page=100" --jq '.[].name')"
+          test -n "$branches"
+          matrix="$(printf '%s\n' "$branches" | python3 -c 'import json,re,sys; print(json.dumps({"include":[{"ref":b,"safe":re.sub(r"[^A-Za-z0-9._-]+","-",b).strip("-") or "branch"} for b in map(str.strip,sys.stdin) if b]},separators=(",",":")))')"
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+  build:
+    needs: discover
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.ref }}
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager --install 'platform-tools' 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Build debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s ./gradlew
+          chmod +x ./gradlew
+          ./gradlew --no-daemon --stacktrace assembleDebug
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: supreme-telegram-${{ matrix.safe }}-${{ github.run_number }}
+          path: '**/build/outputs/apk/**/*.apk'
+          if-no-files-found: error
+          retention-days: 30
